@@ -1,0 +1,32 @@
+---
+// The canonical VSN|CUT lockup, ported from the design system's NavBar.jsx.
+// The divider is a 1px rule, NOT a pipe character: the README is explicit that
+// the bar stays off-white in the canonical mark (a yellow pipe is a deliberate
+// accent variant only). Approximated in Archivo 300-400 at ~0.35em tracking
+// because the supplied logo PNG is locked to a black background.
+const { size = 20 } = Astro.props;
+---
+<span class="wordmark" style={`--wm-size:${size}px`}>
+  VSN<i aria-hidden="true"></i>CUT
+</span>
+
+<style>
+  .wordmark {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: var(--wm-size);
+    letter-spacing: .35em;
+    display: inline-flex;
+    align-items: center;
+    gap: .35em;
+    color: var(--text-body);
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .wordmark i {
+    display: inline-block;
+    width: 1px;
+    height: 1.9em;
+    background: currentColor;
+  }
+</style>

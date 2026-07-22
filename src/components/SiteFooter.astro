@@ -1,0 +1,39 @@
+---
+import Wordmark from './Wordmark.astro';
+// Ported from the design system's Footer.jsx.
+---
+<footer class="foot">
+  <div class="foot-row">
+    <Wordmark size={28} />
+    <div class="foot-col">
+      <a href="mailto:austin@vsncut.com">austin@vsncut.com</a>
+      <a href="tel:+18018655585">801-865-5585</a>
+      <span>Salt Lake City, UT</span>
+    </div>
+  </div>
+  <div class="foot-legal">
+    <span>© 2026 VSN CUT</span>
+    <span>VISION + EXPERTISE = RESULTS</span>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    border-top: 1px solid var(--border-subtle);
+    padding: var(--space-8) var(--container-pad) var(--space-6);
+    display: flex; flex-direction: column; gap: var(--space-7);
+    background: var(--black);
+  }
+  .foot-row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    flex-wrap: wrap; gap: 32px;
+  }
+  .foot-col { display: flex; flex-direction: column; gap: 8px; }
+  .foot-col a, .foot-col span, .foot-legal span {
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em;
+    color: var(--text-muted); text-decoration: none;
+  }
+  .foot-col a { color: var(--text-soft); }
+  .foot-col a:hover { color: var(--accent); }
+  .foot-legal { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+</style>

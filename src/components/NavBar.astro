@@ -1,0 +1,121 @@
+---
+import Wordmark from './Wordmark.astro';
+
+// Sticky top nav from the design system. Mono uppercase links with wide
+// tracking, the bordered ENTER SHORT CUT pill centred, and the yellow BOOK A
+// CALL block. Mobile collapses to a full-screen sheet at <=820px, matching
+// useIsMobile(820) in the source.
+const links = [
+  { label: 'Work', href: '#work' },
+  { label: 'Services', href: '#services' },
+  { label: 'About', href: '#about' },
+];
+---
+<header class="nav">
+  <a class="nav-brand" href="#top" aria-label="VSN CUT home"><Wordmark size={20} /></a>
+
+  <a class="nav-center" href="#short-cut">Enter Short Cut</a>
+
+  <nav class="nav-links">
+    {links.map((l) => <a href={l.href}>{l.label}</a>)}
+    <a class="nav-cta" href="#contact">Book a call</a>
+  </nav>
+
+  <button class="nav-burger" aria-label="Menu" aria-expanded="false" data-burger>
+    <span></span><span></span>
+  </button>
+</header>
+
+<nav class="nav-sheet" data-sheet hidden>
+  {links.map((l) => <a href={l.href}>{l.label}</a>)}
+  <a class="accent" href="#short-cut">Enter Short Cut</a>
+  <a class="sheet-cta" href="#contact">Book a call</a>
+</nav>
+
+<style>
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 var(--container-pad); height: 72px;
+    background: rgba(10,10,11,.96);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .nav-brand { text-decoration: none; }
+  .nav-center {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    white-space: nowrap;
+    font-family: var(--font-display); font-size: 17px; text-transform: uppercase;
+    letter-spacing: .1em; line-height: 1; padding: 10px 22px;
+    border: 1px solid var(--border-strong); color: var(--text-body);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-cine), border-color var(--dur-fast) var(--ease-cine);
+  }
+  .nav-center:hover { color: var(--accent); border-color: var(--accent); }
+  .nav-links { display: flex; align-items: center; gap: 36px; }
+  .nav-links a {
+    font-family: var(--font-mono); font-size: 12px; text-transform: uppercase;
+    letter-spacing: var(--tracking-caps); color: var(--text-soft); text-decoration: none;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-cta {
+    font-family: var(--font-display) !important; font-size: 15px !important;
+    letter-spacing: .06em !important;
+    background: var(--accent); color: var(--black) !important;
+    padding: 10px 20px; line-height: 1;
+  }
+  .nav-cta:hover { background: var(--accent-hover); color: var(--black) !important; }
+
+  .nav-burger {
+    display: none; background: none; border: 1px solid var(--border-strong);
+    padding: 12px 14px; cursor: pointer; flex-direction: column; gap: 5px;
+  }
+  .nav-burger span {
+    display: block; width: 20px; height: 1px; background: var(--white);
+    transition: transform var(--dur-fast) var(--ease-cine);
+  }
+  .nav-sheet {
+    position: fixed; inset: 64px 0 0 0; background: var(--black);
+    display: flex; flex-direction: column; padding: 32px 20px; gap: 8px; z-index: 49;
+  }
+  /* An explicit display value beats the UA's [hidden]{display:none}, so the
+     sheet rendered over the page on desktop. Re-assert it. */
+  .nav-sheet[hidden] { display: none; }
+  @media (min-width: 821px) { .nav-sheet { display: none; } }
+  .nav-sheet a {
+    font-family: var(--font-display); font-size: 40px; text-transform: uppercase;
+    line-height: 1.15; text-decoration: none; color: var(--text-body);
+    border-bottom: 1px solid var(--border-subtle); padding: 12px 0;
+  }
+  .nav-sheet a.accent { color: var(--accent); }
+  .nav-sheet .sheet-cta {
+    margin-top: 24px; font-size: 22px; letter-spacing: .06em;
+    background: var(--accent); color: var(--black); padding: 16px 0;
+    text-align: center; border-bottom: 0;
+  }
+
+  @media (max-width: 820px) {
+    .nav { height: 64px; padding: 0 20px; }
+    .nav-center, .nav-links { display: none; }
+    .nav-burger { display: flex; }
+  }
+</style>
+
+<script>
+  const burger = document.querySelector('[data-burger]');
+  const sheet = document.querySelector('[data-sheet]');
+  if (burger && sheet) {
+    burger.addEventListener('click', () => {
+      const open = sheet.hasAttribute('hidden');
+      if (open) sheet.removeAttribute('hidden'); else sheet.setAttribute('hidden', '');
+      burger.setAttribute('aria-expanded', String(open));
+      burger.classList.toggle('is-open', open);
+    });
+    sheet.querySelectorAll('a').forEach((a) =>
+      a.addEventListener('click', () => {
+        sheet.setAttribute('hidden', '');
+        burger.setAttribute('aria-expanded', 'false');
+        burger.classList.remove('is-open');
+      })
+    );
+  }
+</script>

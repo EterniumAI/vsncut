@@ -88,6 +88,7 @@
 --border-w:1px;
 --frame-ratio:2.39/1; /* cinemascope letterbox */
 --frame-ratio-video:16/9;
+--grain-url:url('/grain.png');
 --grain-opacity:.35;
 --scrim-bottom:linear-gradient(to top,rgba(10,10,11,.92) 0%,rgba(10,10,11,0) 55%);
 --scrim-full:linear-gradient(to top,rgba(10,10,11,.85),rgba(10,10,11,.25));

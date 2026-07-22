@@ -1,25 +1,187 @@
 ---
 import Base from '../layouts/Base.astro';
 import SectionRenderer from '../components/SectionRenderer.astro';
+import ZoomHero from '../components/ZoomHero.astro';
 import { getContent } from '../lib/content';
 
 const content = await getContent();
 const live = !!content?.site?.live && (content?.sections?.length ?? 0) > 0;
+
+// The designed home page, shown until sections are published in CentraMind.
+//
+// Everything below is verified content, not filler. The four portfolio pieces
+// and the 1.6B figure are the only real proof points this business has, and the
+// design system is explicit: never fabricate a metric, testimonial, review count
+// or award, because none exist publicly. So there are no invented client logos
+// and no made-up numbers here.
+//
+// The stills are the design system's generated placeholders, meant to be
+// swapped for real footage frames from Austin.
+const heroTiles = [1, 2, 3, 4, 5, 6, 7].map((n) => ({
+  src: `/stills/still-0${n}.png`,
+  alt: '',
+}));
+
+const work = [
+  { title: "Loyalty / Mic L'Ville", year: '2024', category: 'Music video', src: '/stills/still-01.png' },
+  { title: 'Willow Creek Golf Tournament', year: '2024', category: 'Event highlight', src: '/stills/still-02.png' },
+  { title: 'Two Man Movers / YouTube Ad', year: '2023', category: 'Ad campaign', src: '/stills/still-03.png' },
+];
+
+const services = [
+  { index: '01', title: 'Video production', description: 'Direction, cinematography, editing, drone. One crew end to end.' },
+  { index: '02', title: 'Short Cut / Social', description: 'Our social media arm, SHORT CUT, runs the channels the footage feeds.' },
+  { index: '03', title: 'Content strategy', description: 'What to make, for whom, and why, before a camera rolls.' },
+];
 ---
 <Base site={content?.site ?? {}}>
   {live ? (
     <SectionRenderer sections={content!.sections} products={content!.products} />
   ) : (
-    <section class="holding">
-      <div class="wrap">
+    <Fragment>
+      <ZoomHero images={heroTiles}>
         <span class="eyebrow">Salt Lake City, UT / Video production + social</span>
         <h1>Video that brings<br />customers. Not just views.</h1>
-        <p class="sub">We shoot cinematic video and run your social channels. One small team, one roof.</p>
-        <p>
-          <a class="btn" href="tel:+18018655585">Call 801-865-5585</a>
-        </p>
-        <p class="meta">austin@vsncut.com</p>
-      </div>
-    </section>
+        <p class="sub hero-sub">We shoot cinematic video and run your social channels. One small team, one roof.</p>
+        <span class="scroll-cue">Scroll ▾</span>
+      </ZoomHero>
+
+      <section id="work">
+        <div class="wrap">
+          <div class="heading">
+            <span class="eyebrow">Work / Selected</span>
+            <h2>The work speaks first</h2>
+          </div>
+          <div class="grid">
+            {work.map((w) => (
+              <article class="work-card">
+                <div class="frame">
+                  <img src={w.src} alt={w.title} loading="lazy" />
+                  <div class="frame-scrim"></div>
+                  <div class="frame-grain"></div>
+                </div>
+                <div class="work-body">
+                  <div class="work-meta">
+                    <span class="tag">{w.category}</span>
+                    <span class="year">{w.year}</span>
+                  </div>
+                  <span class="work-title">{w.title}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section class="stat-band" id="short-cut">
+        <div class="wrap stat-inner">
+          <span class="stat-value">1.6B+</span>
+          <span class="stat-label">views across client content</span>
+          <span class="stat-sub">via SHORT CUT, our social media arm</span>
+        </div>
+      </section>
+
+      <section id="services">
+        <div class="wrap">
+          <div class="heading">
+            <span class="eyebrow">Services</span>
+            <h2>One team. One roof.</h2>
+            <p class="sub">Most studios hand you a file and leave. We shoot it, cut it, and keep your channels moving.</p>
+          </div>
+          <div class="grid">
+            {services.map((s) => (
+              <div class="service-card">
+                <span class="service-index">{s.index}</span>
+                <span class="service-title">{s.title}</span>
+                <p>{s.description}</p>
+              </div>
+            ))}
+          </div>
+          <p class="cta-row"><a class="btn" href="#contact">Book a call →</a></p>
+        </div>
+      </section>
+
+      <section id="about">
+        <div class="wrap">
+          <div class="heading">
+            <span class="eyebrow">About</span>
+            <h2>A small crew in Salt Lake City</h2>
+            <p class="sub">
+              Austin Schroader directs and shoots. Spencer Reich on camera, Zach Willis on drone,
+              Olivia Wise running social. Four people, one roof, no handoffs.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact">
+        <div class="wrap">
+          <div class="heading">
+            <span class="eyebrow">Contact</span>
+            <h2>Tell us the outcome you need</h2>
+            <p class="sub">A call costs nothing. austin@vsncut.com · 801-865-5585 · Salt Lake City, UT</p>
+          </div>
+          <p class="cta-row"><a class="btn" href="tel:+18018655585">Call 801-865-5585</a></p>
+        </div>
+      </section>
+    </Fragment>
   )}
 </Base>
+
+<style>
+  .hero-sub { margin: 0 auto; }
+  .scroll-cue {
+    font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+    margin-top: 16px; text-transform: uppercase; letter-spacing: var(--tracking-caps);
+  }
+  .heading { display: flex; flex-direction: column; gap: 14px; margin-bottom: var(--space-7); }
+
+  .work-card {
+    border: 1px solid var(--border-subtle); background: var(--surface-card);
+    transition: border-color var(--dur-fast) var(--ease-cine);
+  }
+  .work-card:hover { border-color: var(--border-strong); }
+  .frame { position: relative; overflow: hidden; aspect-ratio: var(--frame-ratio-video); background: var(--ink-900); }
+  .frame img {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    filter: grayscale(1) contrast(1.08);
+    transition: filter var(--dur-med) var(--ease-cine);
+  }
+  .work-card:hover .frame img { filter: grayscale(.25) contrast(1.05); }
+  .frame-grain { position: absolute; inset: 0; background: var(--grain-url); opacity: var(--grain-opacity); pointer-events: none; }
+  .frame-scrim { position: absolute; inset: 0; background: var(--scrim-bottom); }
+  .work-body { padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .work-meta { display: flex; gap: 8px; align-items: center; }
+  .tag {
+    font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
+    letter-spacing: var(--tracking-caps); padding: 5px 10px;
+    border: 1px solid var(--border-strong); color: var(--text-soft); line-height: 1.2;
+  }
+  .work-card:hover .tag { border-color: var(--accent); color: var(--accent); }
+  .year { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+  .work-title { font-family: var(--font-display); font-size: 26px; line-height: 1; text-transform: uppercase; }
+
+  .stat-band { text-align: center; }
+  .stat-inner { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 12px 28px; }
+  .stat-value {
+    font-family: var(--font-display); font-size: clamp(64px, 9vw, 120px);
+    line-height: .9; text-transform: uppercase; color: var(--accent);
+  }
+  .stat-label { font-family: var(--font-display); font-size: clamp(24px, 3vw, 40px); line-height: 1; text-transform: uppercase; }
+  .stat-sub {
+    font-family: var(--font-mono); font-size: 12px; text-transform: uppercase;
+    letter-spacing: var(--tracking-caps); color: var(--text-muted); width: 100%;
+  }
+
+  .service-card {
+    border: 1px solid var(--border-subtle); background: var(--surface-card);
+    padding: 28px; display: flex; flex-direction: column; gap: 14px;
+    transition: border-color var(--dur-fast) var(--ease-cine);
+  }
+  .service-card:hover { border-color: var(--border-strong); }
+  .service-index { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+  .service-card:hover .service-index { color: var(--accent); }
+  .service-title { font-family: var(--font-display); font-size: 30px; text-transform: uppercase; line-height: 1; }
+  .service-card p { margin: 0; font-size: 15px; color: var(--text-soft); line-height: 1.6; }
+  .cta-row { margin-top: var(--space-7); }
+</style>
