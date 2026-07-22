@@ -1,0 +1,39 @@
+---
+// Maps a contract section type to its component. This list MUST cover every
+// type in SECTION_TYPES (eternium-api/lib/site-sections.js). A type missing
+// here renders nothing at all, with no error -- the same silent-drop failure
+// that left gallery and products invisible on the server renderer for months.
+// The dev-only warning below is what turns that into something you can see.
+import Hero from './sections/Hero.astro';
+import About from './sections/About.astro';
+import Offer from './sections/Offer.astro';
+import Testimonials from './sections/Testimonials.astro';
+import Faq from './sections/Faq.astro';
+import Contact from './sections/Contact.astro';
+import Cta from './sections/Cta.astro';
+import Form from './sections/Form.astro';
+import Gallery from './sections/Gallery.astro';
+import Products from './sections/Products.astro';
+import Showreel from './sections/Showreel.astro';
+import Work from './sections/Work.astro';
+import Team from './sections/Team.astro';
+import Stats from './sections/Stats.astro';
+
+const MAP: Record<string, any> = {
+  hero: Hero, about: About, offer: Offer, testimonials: Testimonials,
+  faq: Faq, contact: Contact, cta: Cta, form: Form,
+  gallery: Gallery, products: Products,
+  showreel: Showreel, work: Work, team: Team, stats: Stats,
+};
+
+const { sections = [], products = [] } = Astro.props;
+if (import.meta.env.DEV) {
+  for (const s of sections) {
+    if (s?.type && !MAP[s.type]) console.warn(`[SectionRenderer] no component for section type "${s.type}" -- it will not render`);
+  }
+}
+---
+{sections.map((s: any) => {
+  const C = MAP[s?.type];
+  return C ? <C s={s} products={products} /> : null;
+})}

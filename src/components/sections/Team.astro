@@ -1,0 +1,18 @@
+---
+const { s } = Astro.props;
+---
+<section class="team" id="team">
+  <div class="wrap">
+    {s.heading && <h2>{s.heading}</h2>}
+    <div class="grid">
+      {(s.items ?? []).map((it: any) => (
+        <div class="card">
+          {it.photo_url && <img src={it.photo_url} alt={it.name} loading="lazy" />}
+          <h3>{it.name}</h3>
+          {it.role && <span class="role">{it.role}</span>}
+          {it.bio && <p>{it.bio}</p>}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

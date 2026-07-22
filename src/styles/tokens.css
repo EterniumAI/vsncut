@@ -1,0 +1,101 @@
+/* VSN CUT design tokens.
+ *
+ * Pulled VERBATIM from the VSN CUT design system
+ * (claude.ai/design project 86fceff9-609d-4112-91d0-f16da3fa7ab6).
+ * DO NOT hand-tune values here. Change them in the design system and re-copy,
+ * or the coded site and the design source silently drift apart.
+ */
+:root{
+/* base */
+--black:#0A0A0B;
+--ink-900:#111113;
+--ink-800:#18181B;
+--ink-700:#232327;
+--ink-600:#2E2E33;
+--white:#F4F2ED;
+--gray-300:#C9C8C4;
+--gray-500:#8A8A8F;
+--gray-700:#55555A;
+--yellow:#FFD100;
+--yellow-deep:#E0B500;
+--redorange:#FF4A1F;
+--redorange-deep:#DB3A12;
+/* semantic */
+--surface-page:var(--black);
+--surface-card:var(--ink-900);
+--surface-raised:var(--ink-800);
+--surface-inverse:var(--white);
+--text-body:var(--white);
+--text-muted:var(--gray-500);
+--text-soft:var(--gray-300);
+--text-inverse:var(--black);
+--text-accent:var(--yellow);
+--accent:var(--yellow);
+--accent-hover:var(--yellow-deep);
+--border-subtle:#26262B;
+--border-strong:#3A3A40;
+--border-accent:var(--yellow);
+--focus-ring:var(--yellow);
+}
+/* SHORT CUT sub-brand scope: red/orange accent */
+[data-brand-scope="shortcut"]{
+--accent:var(--redorange);
+--accent-hover:var(--redorange-deep);
+--text-accent:var(--redorange);
+--border-accent:var(--redorange);
+--focus-ring:var(--redorange);
+}
+:root{
+--font-display:'Bebas Neue',Impact,'Arial Narrow',sans-serif;
+--font-body:'Archivo','Helvetica Neue',Arial,sans-serif;
+--font-mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+/* scale (px) */
+--text-hero:clamp(64px,9vw,140px);
+--text-h1:72px;
+--text-h2:48px;
+--text-h3:32px;
+--text-lg:20px;
+--text-md:16px;
+--text-sm:14px;
+--text-xs:12px;
+/* leading */
+--leading-display:.92;
+--leading-tight:1.1;
+--leading-body:1.6;
+/* tracking */
+--tracking-display:.01em;
+--tracking-eyebrow:.22em;
+--tracking-caps:.08em;
+}
+:root{
+--space-1:4px;
+--space-2:8px;
+--space-3:12px;
+--space-4:16px;
+--space-5:24px;
+--space-6:32px;
+--space-7:48px;
+--space-8:64px;
+--space-9:96px;
+--space-10:128px;
+--container-max:1280px;
+--container-pad:clamp(20px,5vw,64px);
+}
+:root{
+--radius-0:0px;
+--radius-1:2px;
+--radius-pill:999px;
+--border-w:1px;
+--frame-ratio:2.39/1; /* cinemascope letterbox */
+--frame-ratio-video:16/9;
+--grain-opacity:.35;
+--scrim-bottom:linear-gradient(to top,rgba(10,10,11,.92) 0%,rgba(10,10,11,0) 55%);
+--scrim-full:linear-gradient(to top,rgba(10,10,11,.85),rgba(10,10,11,.25));
+}
+:root{
+--ease-cine:cubic-bezier(.22,1,.36,1);
+--ease-cut:cubic-bezier(.83,0,.17,1);
+--dur-fast:180ms;
+--dur-med:420ms;
+--dur-slow:900ms;
+}

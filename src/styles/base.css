@@ -1,0 +1,38 @@
+/* VSN CUT base + site chrome.
+ * The first block is the design system's base.css verbatim; everything under
+ * "site chrome" is layout this coded head needs and the DS does not define.
+ */
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--surface-page);color:var(--text-body);font-family:var(--font-body);font-size:var(--text-md);line-height:var(--leading-body);-webkit-font-smoothing:antialiased}
+a{color:var(--text-body);text-decoration:none;transition:color var(--dur-fast) var(--ease-cine)}
+a:hover{color:var(--accent)}
+::selection{background:var(--accent);color:var(--black)}
+h1,h2,h3{font-family:var(--font-display);font-weight:400;line-height:var(--leading-display);letter-spacing:var(--tracking-display);text-transform:uppercase;margin:0}
+
+/* ── site chrome ───────────────────────────────────────────────────────── */
+img,video{max-width:100%;height:auto;display:block}
+.wrap{max-width:var(--container-max);margin:0 auto;padding:0 var(--container-pad)}
+section{padding:var(--space-9) 0;border-top:1px solid var(--border-subtle)}
+section:first-of-type{border-top:0}
+h1{font-size:var(--text-hero)}
+h2{font-size:clamp(32px,5vw,var(--text-h2))}
+h3{font-size:var(--text-h3)}
+.eyebrow{font-family:var(--font-mono);font-size:var(--text-xs);text-transform:uppercase;letter-spacing:var(--tracking-eyebrow);color:var(--accent)}
+.sub{font-size:var(--text-lg);color:var(--text-soft);max-width:60ch}
+.meta,.role{font-family:var(--font-mono);font-size:var(--text-xs);text-transform:uppercase;letter-spacing:var(--tracking-caps);color:var(--text-muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--space-5)}
+.grid.cols-2{grid-template-columns:repeat(auto-fit,minmax(360px,1fr))}
+.card{background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:var(--radius-0);padding:var(--space-5);transition:border-color var(--dur-fast) var(--ease-cine)}
+.card:hover{border-color:var(--border-strong)}
+.btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:.06em;font-size:17px;padding:12px 24px;background:var(--accent);color:var(--black);border:1px solid transparent;border-radius:var(--radius-0);cursor:pointer;transition:background var(--dur-fast) var(--ease-cine)}
+.btn:hover{background:var(--accent-hover);color:var(--black)}
+.reel{width:100%;aspect-ratio:var(--frame-ratio-video);object-fit:cover;background:var(--black)}
+.stat .value{display:block;font-family:var(--font-display);font-size:clamp(48px,7vw,96px);line-height:.9;color:var(--accent)}
+.stat .label{display:block;font-size:var(--text-lg)}
+.stat .sub{font-family:var(--font-mono);font-size:var(--text-xs);color:var(--text-muted)}
+.site-footer{border-top:1px solid var(--border-subtle);padding:var(--space-7) 0;color:var(--text-muted);font-size:var(--text-sm)}
+.holding{min-height:70vh;display:flex;flex-direction:column;justify-content:center;gap:var(--space-4)}
+input,select,textarea{font-family:var(--font-body);font-size:15px;color:var(--text-body);background:var(--ink-900);border:1px solid var(--border-strong);border-radius:var(--radius-1);padding:12px 14px;width:100%;outline:none;transition:border-color var(--dur-fast) var(--ease-cine)}
+input:focus,select:focus,textarea:focus{border-color:var(--focus-ring)}
+label>span.studio-label,.field-label{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:var(--tracking-caps);color:var(--text-muted)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

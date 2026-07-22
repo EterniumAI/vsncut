@@ -1,0 +1,20 @@
+---
+const { s } = Astro.props;
+---
+<section class="showreel">
+  <div class="wrap">
+    {s.headline && <h2>{s.headline}</h2>}
+    {s.subheadline && <p class="sub">{s.subheadline}</p>}
+    <video
+      class="reel"
+      src={s.video_url}
+      poster={s.poster_url}
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      controls
+    ></video>
+    {s.cta_label && s.cta_href && <p><a class="btn" href={s.cta_href}>{s.cta_label}</a></p>}
+  </div>
+</section>

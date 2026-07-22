@@ -1,0 +1,25 @@
+---
+const { s } = Astro.props;
+---
+<section class="work" id="work">
+  <div class="wrap">
+    {s.heading && <h2>{s.heading}</h2>}
+    <div class="grid">
+      {(s.items ?? []).map((it: any) => {
+        const media = it.video_url
+          ? <video src={it.video_url} poster={it.thumb_url} muted loop playsinline preload="none"></video>
+          : <img src={it.thumb_url} alt={it.title} loading="lazy" />;
+        const meta = [it.client, it.tag].filter(Boolean).join(' · ');
+        return (
+          <article class="card" style="padding:0">
+            {it.link_href ? <a href={it.link_href}>{media}</a> : media}
+            <div style="padding:16px">
+              <h3>{it.title}</h3>
+              {meta && <span class="meta">{meta}</span>}
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</section>

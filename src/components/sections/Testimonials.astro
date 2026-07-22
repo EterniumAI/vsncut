@@ -1,0 +1,16 @@
+---
+const { s } = Astro.props;
+---
+<section class="testimonials">
+  <div class="wrap">
+    {s.heading && <h2>{s.heading}</h2>}
+    <div class="grid cols-2">
+      {(s.items ?? []).map((it: any) => (
+        <blockquote class="card">
+          <p>{it.quote}</p>
+          <cite class="meta">{it.author}{it.role ? ` · ${it.role}` : ''}</cite>
+        </blockquote>
+      ))}
+    </div>
+  </div>
+</section>

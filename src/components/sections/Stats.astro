@@ -1,0 +1,17 @@
+---
+const { s } = Astro.props;
+---
+<section class="stats">
+  <div class="wrap">
+    {s.heading && <h2>{s.heading}</h2>}
+    <div class="grid">
+      {(s.items ?? []).map((it: any) => (
+        <div class="stat">
+          <span class="value">{it.value}</span>
+          <span class="label">{it.label}</span>
+          {it.sub && <span class="sub">{it.sub}</span>}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

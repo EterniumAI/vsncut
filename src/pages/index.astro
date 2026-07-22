@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionRenderer from '../components/SectionRenderer.astro';
+import { getContent } from '../lib/content';
+
+const content = await getContent();
+const live = !!content?.site?.live && (content?.sections?.length ?? 0) > 0;
+---
+<Base site={content?.site ?? {}}>
+  {live ? (
+    <SectionRenderer sections={content!.sections} products={content!.products} />
+  ) : (
+    <section class="holding">
+      <div class="wrap">
+        <span class="eyebrow">Salt Lake City, UT / Video production + social</span>
+        <h1>Video that brings<br />customers. Not just views.</h1>
+        <p class="sub">We shoot cinematic video and run your social channels. One small team, one roof.</p>
+        <p>
+          <a class="btn" href="tel:+18018655585">Call 801-865-5585</a>
+        </p>
+        <p class="meta">austin@vsncut.com</p>
+      </div>
+    </section>
+  )}
+</Base>

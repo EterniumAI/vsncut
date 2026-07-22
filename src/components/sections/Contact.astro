@@ -1,0 +1,14 @@
+---
+const { s } = Astro.props;
+---
+<section class="contact" id="contact">
+  <div class="wrap">
+    <h2>{s.heading}</h2>
+    {s.body && <p class="sub">{s.body}</p>}
+    <p>
+      {s.email && <a href={`mailto:${s.email}`}>{s.email}</a>}
+      {s.email && s.phone && ' · '}
+      {s.phone && <a href={`tel:${String(s.phone).replace(/[^\d+]/g, '')}`}>{s.phone}</a>}
+    </p>
+  </div>
+</section>

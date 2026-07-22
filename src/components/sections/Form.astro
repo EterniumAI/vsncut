@@ -1,0 +1,67 @@
+---
+// Lead capture. Ty's spec: low-friction opt-in (name, email, company, phone),
+// then close on the phone.
+//
+// Two things that look like details and are not:
+//  - The honeypot is named `website`, NOT `company`. The reference
+//    implementation used `company`, but this form needs `company` as a REAL
+//    field, and a bot filling it would silently discard a genuine lead.
+//  - Only flat scalars are posted. The API drops a nested object from the
+//    payload without complaint.
+const { s } = Astro.props;
+const formId = String(s.form_id ?? '');
+---
+<section class="form-section" id="contact">
+  <div class="wrap">
+    {s.heading && <h2>{s.heading}</h2>}
+    <form id="leadForm" data-form-id={formId} style="max-width:520px;display:grid;gap:16px">
+      <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none" />
+      <label><span class="field-label">Name</span><input type="text" name="name" required autocomplete="name" /></label>
+      <label><span class="field-label">Email</span><input type="email" name="email" required autocomplete="email" /></label>
+      <label><span class="field-label">Company</span><input type="text" name="company" autocomplete="organization" /></label>
+      <label><span class="field-label">Phone</span><input type="tel" name="phone" required autocomplete="tel" /></label>
+      <button class="btn" type="submit">{s.button_label ?? 'Book a call'}</button>
+      <p class="meta" id="leadMsg" role="status" aria-live="polite"></p>
+    </form>
+    <div id="leadDone" hidden>
+      <h3>Got it.</h3>
+      <p class="sub">Austin will call you. Want to talk now? <a href="tel:+18018655585">801-865-5585</a></p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const form = document.getElementById('leadForm') as HTMLFormElement | null;
+  if (form) {
+    const msg = document.getElementById('leadMsg')!;
+    const done = document.getElementById('leadDone')!;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      if (fd.get('website')) { form.hidden = true; done.hidden = false; return; }
+      const btn = form.querySelector('button[type=submit]') as HTMLButtonElement;
+      btn.disabled = true;
+      msg.textContent = 'Sending...';
+      const body: Record<string, string> = {
+        name: String(fd.get('name') ?? ''),
+        email: String(fd.get('email') ?? ''),
+        company_name: String(fd.get('company') ?? ''),
+        phone: String(fd.get('phone') ?? ''),
+      };
+      if (document.referrer) body.referrer = document.referrer;
+      try {
+        const res = await fetch(`https://api.eternium.ai/v1/forms/${form.dataset.formId}/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok || data?.ok === false) throw new Error(data?.error || `Request failed (${res.status})`);
+        form.hidden = true; done.hidden = false;
+      } catch (err) {
+        msg.textContent = err instanceof Error ? err.message : 'Something went wrong.';
+        btn.disabled = false;
+      }
+    });
+  }
+</script>

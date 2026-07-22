@@ -1,0 +1,18 @@
+---
+const { s } = Astro.props;
+---
+<section class="gallery">
+  <div class="wrap">
+    {s.heading && <h2>{s.heading}</h2>}
+    <div class="grid">
+      {(s.items ?? []).map((it: any) => (
+        <figure class="card" style="padding:0">
+          {it.link_href
+            ? <a href={it.link_href}><img src={it.image_url} alt={it.caption ?? ''} loading="lazy" /></a>
+            : <img src={it.image_url} alt={it.caption ?? ''} loading="lazy" />}
+          {it.caption && <figcaption class="meta" style="padding:12px">{it.caption}</figcaption>}
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,17 @@
+---
+const { s } = Astro.props;
+---
+<section class="offer" id="services">
+  <div class="wrap">
+    <h2>{s.heading}</h2>
+    <div class="grid">
+      {(s.items ?? []).map((it: any) => (
+        <div class="card">
+          <h3>{it.title}</h3>
+          {it.description && <p>{it.description}</p>}
+          {it.price_label && <span class="meta">{it.price_label}</span>}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

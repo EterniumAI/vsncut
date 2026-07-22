@@ -1,0 +1,21 @@
+---
+const { s, products = [] } = Astro.props;
+const list = s.mode === 'curated' && Array.isArray(s.product_ids) && s.product_ids.length
+  ? s.product_ids.map((id: string) => products.find((p: any) => p?.id === id)).filter(Boolean)
+  : products;
+---
+<section class="products" id="products">
+  <div class="wrap">
+    {s.heading && <h2>{s.heading}</h2>}
+    {s.subheading && <p class="sub">{s.subheading}</p>}
+    <div class="grid">
+      {list.map((p: any) => (
+        <div class="card">
+          {p.image_url && <img src={p.image_url} alt={p.name ?? ''} loading="lazy" />}
+          <h3>{p.name}</h3>
+          {(p.price_label || p.price) && <span class="meta">{p.price_label || p.price}</span>}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

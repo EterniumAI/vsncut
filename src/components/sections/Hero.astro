@@ -1,0 +1,11 @@
+---
+const { s } = Astro.props;
+---
+<section class="hero">
+  <div class="wrap">
+    <h1>{s.headline}</h1>
+    {s.subheadline && <p class="sub">{s.subheadline}</p>}
+    {s.cta_label && s.cta_href && <p><a class="btn" href={s.cta_href}>{s.cta_label}</a></p>}
+    {s.image_url && <img src={s.image_url} alt={s.headline ?? ''} loading="eager" />}
+  </div>
+</section>

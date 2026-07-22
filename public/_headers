@@ -1,0 +1,10 @@
+# index.html must never be cached or a stale shell points at a dead bundle.
+# Hashed assets and fonts are immutable and cached for a year.
+/
+  Cache-Control: max-age=0, must-revalidate
+/index.html
+  Cache-Control: max-age=0, must-revalidate
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable

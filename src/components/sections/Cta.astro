@@ -1,0 +1,10 @@
+---
+const { s } = Astro.props;
+---
+<section class="cta-band">
+  <div class="wrap">
+    <h2>{s.heading}</h2>
+    {s.subheading && <p class="sub">{s.subheading}</p>}
+    <p><a class="btn" href={s.button_href}>{s.button_label}</a></p>
+  </div>
+</section>
