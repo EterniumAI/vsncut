@@ -9,7 +9,7 @@ interface Props { site?: SiteMeta }
 const { site = {} } = Astro.props;
 
 const name = site.name?.trim() || 'VSN CUT';
-const title = site.seo?.title?.trim() || 'VSN CUT — Video production and social, Salt Lake City';
+const title = site.seo?.title?.trim() || 'VSN CUT / Video production and social, Salt Lake City';
 const description =
   site.seo?.description?.trim() ||
   'Cinematic video production and social media management under one roof. Salt Lake City, Utah.';
