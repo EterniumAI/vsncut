@@ -13,7 +13,12 @@ const title = site.seo?.title?.trim() || 'VSN CUT / Video production and social,
 const description =
   site.seo?.description?.trim() ||
   'Cinematic video production and social media management under one roof. Salt Lake City, Utah.';
-const ogImage = site.seo?.og_image;
+// Link previews need an ABSOLUTE url; a root-relative path renders as a broken
+// card on every platform that unfurls. Astro.url is the real request url under
+// SSR, so this resolves correctly on the pages.dev preview and on vsncut.com
+// without hardcoding either. A CentraMind-published og_image wins if set.
+const ogImage = site.seo?.og_image?.trim() || new URL('/media/og.jpg', Astro.url).href;
+const ogImageAlt = 'VSN CUT. Video that brings customers. Not just views.';
 
 // Runtime brand overrides are written as inline CSS vars on <body> so they
 // cascade past Astro's scoped styles. Guarded: a non-hex value is dropped
@@ -45,12 +50,27 @@ const ld = {
     <meta name="theme-color" content="#0A0A0B" />
     <link rel="canonical" href={Astro.url.href} />
 
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={name} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    {ogImage && <meta property="og:image" content={ogImage} />}
-    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:secure_url" content={ogImage} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

@@ -1,0 +1,210 @@
+---
+// The signature scroll-driven zoom-parallax hero, ported from the design
+// system's ZoomHero.jsx. A 300vh scroll container with a sticky viewport; up to
+// 7 tiles scale from 1 to [4,5,6,5,6,8,9] as you scroll, while the overlay
+// copy fades out.
+//
+// Tile 0 is the load-bearing one: it sits dead centre at 25vw x 25vh and
+// scales 4x, which is exactly 100vw x 100vh, so it lands as the full-screen
+// backdrop the whole sequence resolves into. That is the tile that carries the
+// video montage; the other six are stills from six different client pieces.
+// Putting video in all seven would mean seven decoders for tiles that are
+// off-screen for most of the scroll.
+//
+// Deliberately vanilla: the source is already a hand-rolled rAF recreation of
+// the client's framer-motion reference, so there is no motion library to pull
+// in. Bails out entirely under prefers-reduced-motion, leaving a static frame.
+interface Tile { src: string; alt?: string }
+interface Props {
+  tiles: Tile[];
+  video?: string;
+  videoSmall?: string;
+  videoPoster?: string;
+}
+const { tiles = [], video, videoSmall, videoPoster } = Astro.props;
+
+const SCALES = [4, 5, 6, 5, 6, 8, 9];
+const LAYOUTS = [
+  { top: '0',      left: '0',       w: '25vw', h: '25vh' },
+  { top: '-30vh',  left: '5vw',     w: '35vw', h: '30vh' },
+  { top: '-10vh',  left: '-25vw',   w: '20vw', h: '45vh' },
+  { top: '0',      left: '27.5vw',  w: '25vw', h: '25vh' },
+  { top: '27.5vh', left: '5vw',     w: '20vw', h: '25vh' },
+  { top: '27.5vh', left: '-22.5vw', w: '30vw', h: '25vh' },
+  { top: '22.5vh', left: '25vw',    w: '15vw', h: '15vh' },
+];
+const shown = tiles.slice(0, 7);
+---
+<div class="zoom" data-zoom id="top">
+  <div class="zoom-sticky">
+    {shown.map((img, i) => {
+      const L = LAYOUTS[i % LAYOUTS.length];
+      const isStage = i === 0 && !!video;
+      return (
+        <div class="zoom-tile" data-tile data-scale={SCALES[i % SCALES.length]}>
+          <div class="zoom-frame" style={`width:${L.w};height:${L.h};top:${L.top};left:${L.left}`}>
+            <img
+              src={img.src}
+              alt={img.alt ?? ''}
+              loading={i < 3 ? 'eager' : 'lazy'}
+              fetchpriority={i === 0 ? 'high' : undefined}
+            />
+            {isStage && (
+              <video
+                class="zoom-video"
+                data-zoom-video
+                data-src={video}
+                data-src-small={videoSmall ?? video}
+                poster={videoPoster}
+                muted
+                loop
+                playsinline
+                preload="auto"
+                aria-hidden="true"
+                tabindex="-1"
+              ></video>
+            )}
+            <div class="zoom-grain"></div>
+          </div>
+        </div>
+      );
+    })}
+
+    <div class="zoom-overlay" data-overlay>
+      <slot />
+    </div>
+
+    <button class="motion-toggle" type="button" data-motion-toggle aria-pressed="false">
+      <span data-motion-label>Pause motion</span>
+    </button>
+  </div>
+</div>
+
+<style>
+  .zoom { position: relative; height: 300vh; }
+  .zoom-sticky {
+    position: sticky; top: 0; height: 100vh; overflow: hidden; background: var(--black);
+  }
+  .zoom-tile {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    will-change: transform;
+  }
+  .zoom-frame { position: relative; overflow: hidden; }
+  .zoom-frame img,
+  .zoom-video {
+    width: 100%; height: 100%; object-fit: cover;
+    filter: grayscale(1) contrast(1.1);
+  }
+  .zoom-video {
+    position: absolute; inset: 0;
+    opacity: 0; transition: opacity var(--dur-slow) var(--ease-cine);
+  }
+  /* The montage only earns its place once the centre tile is large enough to
+     read as footage rather than a thumbnail. */
+  .zoom-video.is-playing { opacity: 1; filter: grayscale(.2) contrast(1.05); }
+  .zoom-grain {
+    position: absolute; inset: 0;
+    background: var(--grain-url); opacity: var(--grain-opacity);
+    pointer-events: none;
+  }
+  .zoom-overlay {
+    position: absolute; inset: 0; z-index: 2;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 0 24px; pointer-events: none;
+    background: radial-gradient(ellipse at center, rgba(10,10,11,.55), rgba(10,10,11,.15));
+  }
+  .zoom-overlay :global(a) { pointer-events: auto; }
+
+  /* The page's single stop control for auto-playing video. A real focusable
+     button, because WCAG 2.2.2 wants a mechanism keyboard and switch users can
+     actually reach. */
+  .motion-toggle {
+    position: absolute; z-index: 3; right: var(--container-pad); bottom: 24px;
+    font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
+    letter-spacing: var(--tracking-caps); line-height: 1;
+    padding: 9px 13px; cursor: pointer;
+    background: rgba(10,10,11,.72); color: var(--text-soft);
+    border: 1px solid var(--border-strong); border-radius: var(--radius-0);
+    transition: color var(--dur-fast) var(--ease-cine), border-color var(--dur-fast) var(--ease-cine);
+  }
+  .motion-toggle:hover { color: var(--accent); border-color: var(--accent); }
+  .motion-toggle:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zoom { height: 100vh; }
+    .zoom-video { display: none; }
+    .motion-toggle { display: none; }
+  }
+</style>
+
+<script>
+  import { motionAllowed, setMotion, onMotionChange } from '../lib/motion';
+
+  // The stop control is wired first and unconditionally: it governs the work
+  // loops and the social reels too, so it has to work even if this hero's
+  // video never loads.
+  const btn = document.querySelector<HTMLButtonElement>('[data-motion-toggle]');
+  const label = document.querySelector<HTMLElement>('[data-motion-label]');
+  btn?.addEventListener('click', () => {
+    const nowPaused = document.documentElement.dataset.motion !== 'paused';
+    setMotion(nowPaused);
+    btn.setAttribute('aria-pressed', String(nowPaused));
+    if (label) label.textContent = nowPaused ? 'Play motion' : 'Pause motion';
+  });
+
+  const root = document.querySelector<HTMLElement>('[data-zoom]');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (root && !reduce.matches) {
+    const tiles = Array.from(root.querySelectorAll<HTMLElement>('[data-tile]'));
+    const overlay = root.querySelector<HTMLElement>('[data-overlay]');
+    let raf: number | null = null;
+
+    const tick = () => {
+      raf = null;
+      const r = root.getBoundingClientRect();
+      const total = r.height - window.innerHeight;
+      if (total <= 0) return;
+      const p = Math.min(1, Math.max(0, -r.top / total));
+      tiles.forEach((t) => {
+        const target = Number(t.dataset.scale || 1);
+        t.style.transform = `scale(${1 + p * (target - 1)})`;
+      });
+      if (overlay) overlay.style.opacity = String(Math.max(0, 1 - p * 2.2));
+    };
+    const schedule = () => { if (!raf) raf = requestAnimationFrame(tick); };
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule, { passive: true });
+    tick();
+
+    // The centre tile's montage.
+    const v = root.querySelector<HTMLVideoElement>('[data-zoom-video]');
+    if (v) {
+      const small = window.matchMedia('(max-width: 820px)').matches;
+      const load = () => {
+        if (v.src) return;
+        const src = (small ? v.dataset.srcSmall : v.dataset.src) || v.dataset.src;
+        if (src) v.src = src;
+      };
+      const play = () => {
+        if (!motionAllowed()) return;
+        load();
+        v.play().then(() => v.classList.add('is-playing')).catch(() => {});
+      };
+      if (motionAllowed()) play();
+
+      let onScreen = true;
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(
+          ([e]) => { onScreen = e.isIntersecting; if (onScreen) play(); else v.pause(); },
+          { threshold: 0.05 }
+        ).observe(root);
+      }
+      onMotionChange((allowed) => {
+        if (allowed && onScreen) play();
+        else { v.pause(); v.classList.remove('is-playing'); }
+      });
+    }
+  }
+</script>

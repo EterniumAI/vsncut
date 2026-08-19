@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import SectionRenderer from '../components/SectionRenderer.astro';
-import VideoHero from '../components/VideoHero.astro';
+import ZoomHero from '../components/ZoomHero.astro';
 import WorkGrid from '../components/WorkGrid.astro';
 import FeaturedFilm from '../components/FeaturedFilm.astro';
 import SocialStrip from '../components/SocialStrip.astro';
@@ -102,6 +102,19 @@ const reels: Reel[] = [
   { key: 'publik-basic',    client: 'Basic AF',                            loop: '/media/social/publik-basic.mp4',    poster: '/media/posters/publik-basic.jpg' },
 ];
 
+// The zoom-parallax hero's seven tiles, one frame per client piece. Tile 0
+// sits dead centre and scales to exactly fill the viewport, so it is the one
+// that carries the montage.
+const heroTiles = [
+  { src: '/media/tiles/tile-01.jpg', alt: '' },
+  { src: '/media/tiles/tile-02.jpg', alt: '' },
+  { src: '/media/tiles/tile-03.jpg', alt: '' },
+  { src: '/media/tiles/tile-04.jpg', alt: '' },
+  { src: '/media/tiles/tile-05.jpg', alt: '' },
+  { src: '/media/tiles/tile-06.jpg', alt: '' },
+  { src: '/media/tiles/tile-07.jpg', alt: '' },
+];
+
 const services = [
   { index: '01', title: 'Video production', description: 'Direction, cinematography, editing, drone. One crew end to end.' },
   { index: '02', title: 'Short Cut / Social', description: 'Our social media arm, SHORT CUT, runs the channels the footage feeds.' },
@@ -113,11 +126,22 @@ const services = [
     <SectionRenderer sections={content!.sections} products={content!.products} />
   ) : (
     <Fragment>
-      <VideoHero
+      <ZoomHero
+        tiles={heroTiles}
         video="/media/hero/hero-loop.mp4"
         videoSmall="/media/hero/hero-loop-720.mp4"
-        poster="/media/posters/hero.jpg"
-      />
+        videoPoster="/media/posters/hero.jpg"
+      >
+        <span class="eyebrow">Salt Lake City, UT / Video production + social</span>
+        <h1>Video that brings<br />customers. Not just views.</h1>
+        <p class="sub hero-sub">
+          We shoot cinematic video and run your social channels. One small team, one roof.
+        </p>
+        <div class="hero-actions">
+          <a class="btn" href="#work">See the work</a>
+          <a class="btn-ghost" href="#contact">Book a call</a>
+        </div>
+      </ZoomHero>
 
       <WorkGrid items={work} />
 
@@ -195,6 +219,17 @@ const services = [
 
 <style>
   .heading { display: flex; flex-direction: column; gap: 14px; margin-bottom: var(--space-7); }
+
+  .hero-sub { margin: 0 auto; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 10px; }
+  .btn-ghost {
+    display: inline-flex; align-items: center;
+    font-family: var(--font-display); text-transform: uppercase; letter-spacing: .06em;
+    font-size: 17px; padding: 12px 24px; line-height: 1.25;
+    border: 1px solid var(--border-strong); color: var(--text-body);
+    transition: border-color var(--dur-fast) var(--ease-cine), color var(--dur-fast) var(--ease-cine);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
   .stat-band { text-align: center; }
   .stat-inner { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 12px 28px; }
