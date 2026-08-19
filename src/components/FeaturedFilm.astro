@@ -1,0 +1,50 @@
+---
+// One piece shown at full length with its own sound, as the counterweight to
+// the silent loops everywhere else. The work grid proves range; this proves
+// the company can hold a viewer for a minute straight.
+interface Props {
+  src: string;
+  poster: string;
+  title: string;
+  client: string;
+  tag: string;
+  blurb: string;
+}
+const { src, poster, title, client, tag, blurb } = Astro.props;
+---
+<section class="featured">
+  <div class="wrap">
+    <div class="heading">
+      <span class="eyebrow">Featured / Watch in full</span>
+      <h2>{title}</h2>
+      <p class="sub">{blurb}</p>
+    </div>
+
+    <div class="film">
+      <video
+        class="reel"
+        src={src}
+        poster={poster}
+        controls
+        playsinline
+        preload="none"
+        width="1920"
+        height="1080"
+      ></video>
+      <div class="film-meta">
+        <span class="meta">{client}</span>
+        <span class="meta">{tag}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .heading { display: flex; flex-direction: column; gap: 14px; margin-bottom: var(--space-7); }
+  .film { border: 1px solid var(--border-subtle); background: var(--surface-card); }
+  .film .reel { display: block; }
+  .film-meta {
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    padding: 14px 18px; border-top: 1px solid var(--border-subtle);
+  }
+</style>

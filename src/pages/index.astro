@@ -1,7 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
 import SectionRenderer from '../components/SectionRenderer.astro';
-import ZoomHero from '../components/ZoomHero.astro';
+import VideoHero from '../components/VideoHero.astro';
+import WorkGrid from '../components/WorkGrid.astro';
+import FeaturedFilm from '../components/FeaturedFilm.astro';
+import SocialStrip from '../components/SocialStrip.astro';
+import type { WorkItem, Reel } from '../lib/media';
 import { getContent } from '../lib/content';
 
 const content = await getContent();
@@ -9,23 +13,93 @@ const live = !!content?.site?.live && (content?.sections?.length ?? 0) > 0;
 
 // The designed home page, shown until sections are published in CentraMind.
 //
-// Everything below is verified content, not filler. The four portfolio pieces
-// and the 1.6B figure are the only real proof points this business has, and the
-// design system is explicit: never fabricate a metric, testimonial, review count
-// or award, because none exist publicly. So there are no invented client logos
-// and no made-up numbers here.
+// Everything here is verified, not filler. Every clip is real client work cut
+// from the masters Austin supplied, and a `client` is named ONLY where the
+// business appears on screen in the footage itself. The design system is
+// explicit: never fabricate a metric, testimonial, review count or award,
+// because none exist publicly for this business. So there are no invented
+// client logos and no made-up numbers.
 //
-// The stills are the design system's generated placeholders, meant to be
-// swapped for real footage frames from Austin.
-const heroTiles = [1, 2, 3, 4, 5, 6, 7].map((n) => ({
-  src: `/stills/still-0${n}.png`,
-  alt: '',
-}));
+// Ordering is a sales decision, not an archive: the two pieces that read most
+// clearly as "this made someone money" lead, craft follows, and the long-form
+// documentary work anchors the back half.
+const work: WorkItem[] = [
+  {
+    key: 'kennethboggs',
+    title: 'Kenneth Boggs',
+    client: 'Custom By Kenneth Boggs',
+    tag: 'Commercial',
+    year: '2025',
+    loop: '/media/work/kennethboggs.mp4',
+    poster: '/media/posters/kennethboggs.jpg',
+    full: '/media/full/kennethboggs.mp4',
+  },
+  {
+    key: 'hhc',
+    title: 'Houston TX Hot Chicken',
+    client: 'Houston TX Hot Chicken',
+    tag: 'Brand campaign',
+    loop: '/media/work/hhc.mp4',
+    poster: '/media/posters/hhc.jpg',
+    full: '/media/full/hhc.mp4',
+  },
+  {
+    key: 'carpa',
+    title: 'An Evening with Carpa',
+    tag: 'Short film',
+    loop: '/media/work/carpa.mp4',
+    poster: '/media/posters/carpa.jpg',
+    full: '/media/featured/carpa-film.mp4',
+  },
+  {
+    key: 'absoluteflight',
+    title: 'Absolute Flight',
+    client: 'Absolute Flight',
+    tag: 'Documentary',
+    loop: '/media/work/absoluteflight.mp4',
+    poster: '/media/posters/absoluteflight.jpg',
+    full: '/media/full/absoluteflight.mp4',
+  },
+  {
+    key: 'lehimtb',
+    title: 'Lehi MTB',
+    client: 'Lehi MTB',
+    tag: 'Event film',
+    year: '2024',
+    loop: '/media/work/lehimtb.mp4',
+    poster: '/media/posters/lehimtb.jpg',
+    full: '/media/full/lehimtb.mp4',
+  },
+  {
+    key: 'ecopoint',
+    title: 'EcoPoint',
+    client: 'EcoPoint',
+    tag: 'Brand film',
+    loop: '/media/work/ecopoint.mp4',
+    poster: '/media/posters/ecopoint.jpg',
+    full: '/media/full/ecopoint.mp4',
+  },
+  {
+    key: 'basicaf',
+    title: 'Basic AF',
+    client: 'Basic AF',
+    tag: 'Documentary series',
+    loop: '/media/work/basicaf.mp4',
+    poster: '/media/posters/basicaf.jpg',
+    full: '/media/full/basicaf.mp4',
+  },
+];
 
-const work = [
-  { title: "Loyalty / Mic L'Ville", year: '2024', category: 'Music video', src: '/stills/still-01.png' },
-  { title: 'Willow Creek Golf Tournament', year: '2024', category: 'Event highlight', src: '/stills/still-02.png' },
-  { title: 'Two Man Movers / YouTube Ad', year: '2023', category: 'Ad campaign', src: '/stills/still-03.png' },
+const reels: Reel[] = [
+  { key: 'kb-suits',        client: 'Kenneth Boggs / Suits and Supercars', loop: '/media/social/kb-suits.mp4',        poster: '/media/posters/kb-suits.jpg' },
+  { key: 'hhc-farmington',  client: 'Houston TX Hot Chicken / Farmington', loop: '/media/social/hhc-farmington.mp4',  poster: '/media/posters/hhc-farmington.jpg' },
+  { key: 'ee-obscene',      client: 'Estates and Exotics',                 loop: '/media/social/ee-obscene.mp4',      poster: '/media/posters/ee-obscene.jpg' },
+  { key: 'estates-exotics', client: 'Estates and Exotics',                 loop: '/media/social/estates-exotics.mp4', poster: '/media/posters/estates-exotics.jpg' },
+  { key: 'hhc-stgeorge',    client: 'Houston TX Hot Chicken / St. George', loop: '/media/social/hhc-stgeorge.mp4',    poster: '/media/posters/hhc-stgeorge.jpg' },
+  { key: 'publik-2',        client: 'Basic AF',                            loop: '/media/social/publik-2.mp4',        poster: '/media/posters/publik-2.jpg' },
+  { key: 'taste-test',      client: 'Basic AF / Taste test',               loop: '/media/social/taste-test.mp4',      poster: '/media/posters/taste-test.jpg' },
+  { key: 'jason-chris',     client: 'Basic AF',                            loop: '/media/social/jason-chris.mp4',     poster: '/media/posters/jason-chris.jpg' },
+  { key: 'publik-basic',    client: 'Basic AF',                            loop: '/media/social/publik-basic.mp4',    poster: '/media/posters/publik-basic.jpg' },
 ];
 
 const services = [
@@ -39,47 +113,32 @@ const services = [
     <SectionRenderer sections={content!.sections} products={content!.products} />
   ) : (
     <Fragment>
-      <ZoomHero images={heroTiles}>
-        <span class="eyebrow">Salt Lake City, UT / Video production + social</span>
-        <h1>Video that brings<br />customers. Not just views.</h1>
-        <p class="sub hero-sub">We shoot cinematic video and run your social channels. One small team, one roof.</p>
-        <span class="scroll-cue">Scroll ▾</span>
-      </ZoomHero>
+      <VideoHero
+        video="/media/hero/hero-loop.mp4"
+        videoSmall="/media/hero/hero-loop-720.mp4"
+        poster="/media/posters/hero.jpg"
+      />
 
-      <section id="work">
-        <div class="wrap">
-          <div class="heading">
-            <span class="eyebrow">Work / Selected</span>
-            <h2>The work speaks first</h2>
-          </div>
-          <div class="grid">
-            {work.map((w) => (
-              <article class="work-card">
-                <div class="frame">
-                  <img src={w.src} alt={w.title} loading="lazy" />
-                  <div class="frame-scrim"></div>
-                  <div class="frame-grain"></div>
-                </div>
-                <div class="work-body">
-                  <div class="work-meta">
-                    <span class="tag">{w.category}</span>
-                    <span class="year">{w.year}</span>
-                  </div>
-                  <span class="work-title">{w.title}</span>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+      <WorkGrid items={work} />
 
-      <section class="stat-band" id="short-cut">
+      <FeaturedFilm
+        src="/media/featured/carpa-film.mp4"
+        poster="/media/posters/carpa-film.jpg"
+        title="An Evening with Carpa"
+        client="Short film"
+        tag="Directed and shot by VSN CUT"
+        blurb="A minute of what a camera can do for a story when nobody is rushing it. Sound on."
+      />
+
+      <section class="stat-band">
         <div class="wrap stat-inner">
           <span class="stat-value">1.6B+</span>
           <span class="stat-label">views across client content</span>
           <span class="stat-sub">via SHORT CUT, our social media arm</span>
         </div>
       </section>
+
+      <SocialStrip reels={reels} />
 
       <section id="services">
         <div class="wrap">
@@ -97,7 +156,7 @@ const services = [
               </div>
             ))}
           </div>
-          <p class="cta-row"><a class="btn" href="#contact">Book a call →</a></p>
+          <p class="cta-row"><a class="btn" href="#contact">Book a call</a></p>
         </div>
       </section>
 
@@ -129,37 +188,7 @@ const services = [
 </Base>
 
 <style>
-  .hero-sub { margin: 0 auto; }
-  .scroll-cue {
-    font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
-    margin-top: 16px; text-transform: uppercase; letter-spacing: var(--tracking-caps);
-  }
   .heading { display: flex; flex-direction: column; gap: 14px; margin-bottom: var(--space-7); }
-
-  .work-card {
-    border: 1px solid var(--border-subtle); background: var(--surface-card);
-    transition: border-color var(--dur-fast) var(--ease-cine);
-  }
-  .work-card:hover { border-color: var(--border-strong); }
-  .frame { position: relative; overflow: hidden; aspect-ratio: var(--frame-ratio-video); background: var(--ink-900); }
-  .frame img {
-    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-    filter: grayscale(1) contrast(1.08);
-    transition: filter var(--dur-med) var(--ease-cine);
-  }
-  .work-card:hover .frame img { filter: grayscale(.25) contrast(1.05); }
-  .frame-grain { position: absolute; inset: 0; background: var(--grain-url); opacity: var(--grain-opacity); pointer-events: none; }
-  .frame-scrim { position: absolute; inset: 0; background: var(--scrim-bottom); }
-  .work-body { padding: 18px; display: flex; flex-direction: column; gap: 10px; }
-  .work-meta { display: flex; gap: 8px; align-items: center; }
-  .tag {
-    font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
-    letter-spacing: var(--tracking-caps); padding: 5px 10px;
-    border: 1px solid var(--border-strong); color: var(--text-soft); line-height: 1.2;
-  }
-  .work-card:hover .tag { border-color: var(--accent); color: var(--accent); }
-  .year { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
-  .work-title { font-family: var(--font-display); font-size: 26px; line-height: 1; text-transform: uppercase; }
 
   .stat-band { text-align: center; }
   .stat-inner { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 12px 28px; }
