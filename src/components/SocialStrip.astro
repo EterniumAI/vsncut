@@ -1,0 +1,143 @@
+---
+// SHORT CUT: the vertical social arm. A horizontal rail of 9:16 reels that
+// play muted when scrolled into view and unmute on tap, which is the only
+// interaction pattern people already know from the feeds this work ships to.
+//
+// This section carries data-brand-scope="shortcut", so every accent inside it
+// resolves to the red/orange sub-brand instead of the yellow house accent.
+// That token swap is the whole reason the scope attribute exists.
+import type { Reel } from '../lib/media';
+interface Props { reels: Reel[] }
+const { reels } = Astro.props;
+---
+<section id="short-cut" data-brand-scope="shortcut">
+  <div class="wrap">
+    <div class="heading">
+      <span class="eyebrow">Short Cut / Social</span>
+      <h2>Built for the feed</h2>
+      <p class="sub">
+        SHORT CUT is our social arm. Vertical, sound on, cut to hold attention in the
+        first second. Tap any reel for audio.
+      </p>
+    </div>
+  </div>
+
+  <div class="rail" data-rail>
+    {reels.map((r) => (
+      <button class="reel-card" type="button" data-reel aria-label={`Play ${r.client} reel with sound`}>
+        <video
+          data-reel-video
+          src={r.loop}
+          poster={r.poster}
+          muted
+          loop
+          playsinline
+          preload="none"
+        ></video>
+        <div class="reel-grain"></div>
+        <span class="reel-client">{r.client}</span>
+        <span class="reel-audio" data-audio-flag>Sound off</span>
+      </button>
+    ))}
+  </div>
+</section>
+
+<style>
+  .heading { display: flex; flex-direction: column; gap: 14px; margin-bottom: var(--space-7); }
+
+  .rail {
+    display: flex; gap: var(--space-4);
+    overflow-x: auto; overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    padding: 0 var(--container-pad) var(--space-3);
+    /* Without this the snapport is the padding box, so the browser snaps the
+       first card by scrolling exactly one gutter and the rail starts flush to
+       the viewport edge, out of line with the heading above it. */
+    scroll-padding-left: var(--container-pad);
+    scrollbar-width: thin;
+  }
+  .reel-card {
+    position: relative; flex: 0 0 auto;
+    width: clamp(200px, 46vw, 268px); aspect-ratio: 9 / 16;
+    scroll-snap-align: start;
+    background: var(--ink-900); border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-0); padding: 0; overflow: hidden;
+    cursor: pointer; font: inherit; color: inherit;
+    transition: border-color var(--dur-fast) var(--ease-cine);
+  }
+  .reel-card:hover { border-color: var(--accent); }
+  .reel-card:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: -2px; }
+  .reel-card video {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  }
+  .reel-grain {
+    position: absolute; inset: 0; background: var(--grain-url);
+    opacity: var(--grain-opacity); pointer-events: none;
+  }
+  .reel-client {
+    position: absolute; left: 12px; bottom: 12px; max-width: calc(100% - 24px);
+    font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+    letter-spacing: var(--tracking-caps); line-height: 1.2; text-align: left;
+    padding: 7px 10px; background: rgba(10,10,11,.72);
+    border: 1px solid var(--border-strong); color: var(--text-soft);
+  }
+  .reel-audio {
+    position: absolute; right: 12px; top: 12px;
+    font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+    letter-spacing: var(--tracking-caps); line-height: 1;
+    padding: 6px 9px; background: rgba(10,10,11,.72);
+    border: 1px solid var(--border-strong); color: var(--text-muted);
+  }
+  .reel-card.is-live .reel-audio { color: var(--accent); border-color: var(--accent); }
+
+  @media (max-width: 820px) {
+    .rail { padding-left: 20px; padding-right: 20px; scroll-padding-left: 20px; }
+  }
+</style>
+
+<script>
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-reel]'));
+
+  // Only the reels actually on screen decode. Without this the rail would keep
+  // nine 1080-tall videos alive at once on a phone.
+  if (!reduce && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          const v = e.target.querySelector<HTMLVideoElement>('[data-reel-video]');
+          if (!v) return;
+          if (e.isIntersecting) v.play().catch(() => {});
+          else v.pause();
+        });
+      },
+      { threshold: 0.35 }
+    );
+    cards.forEach((c) => io.observe(c));
+  }
+
+  // Tap to unmute. Only one reel is ever audible, so tapping a second one
+  // silences the first rather than stacking two soundtracks.
+  cards.forEach((card) => {
+    card.addEventListener('click', () => {
+      const v = card.querySelector<HTMLVideoElement>('[data-reel-video]');
+      const flag = card.querySelector<HTMLElement>('[data-audio-flag]');
+      if (!v) return;
+      const turningOn = v.muted;
+      cards.forEach((other) => {
+        const ov = other.querySelector<HTMLVideoElement>('[data-reel-video]');
+        const of = other.querySelector<HTMLElement>('[data-audio-flag]');
+        if (!ov) return;
+        ov.muted = true;
+        other.classList.remove('is-live');
+        if (of) of.textContent = 'Sound off';
+      });
+      if (turningOn) {
+        v.muted = false;
+        card.classList.add('is-live');
+        if (flag) flag.textContent = 'Sound on';
+        v.play().catch(() => {});
+      }
+    });
+  });
+</script>
