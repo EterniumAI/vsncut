@@ -33,9 +33,29 @@ none exist publicly for this business.
 
 ## Footage
 
-`public/media/` holds the web encodes of Austin's masters. Nothing here is a
-placeholder. Every clip is cut from a real client piece and re-encoded for the
-browser; the 4K/1080p masters are NOT in the repo.
+The footage is NOT in this repo. It lives in the **`vsncut-media` R2 bucket**,
+served from **https://media.vsncut.com**, and is referenced through `media()`
+in `src/lib/media.ts` (override with `PUBLIC_MEDIA_ORIGIN`).
+
+It moved off Cloudflare Pages because **Pages does not honour HTTP Range**: it
+answers a `Range:` header with `200` and the whole body, on every asset,
+including `grain.png`. Video still plays, because browsers fall back to a
+progressive download, but seeking the 62s featured film re-pulls all 20MB and
+scrubbing is unusable. R2 returns real `206 Partial Content`.
+
+**Uploading:** `wrangler r2 object put vsncut-media/<key> --file <path>
+--content-type <ct> --remote`. **Without `--remote` wrangler writes to the local
+miniflare simulation, prints "Upload complete", and the real bucket stays
+empty.** Objects carry `cache-control: public, max-age=31536000, immutable` and
+filenames are NOT content-hashed, so replacing a clip in place will not be
+picked up by anything holding a cached copy: upload under a new key and change
+the reference, or purge that path.
+
+A 404 from `media.vsncut.com` caches for 4 hours. If you probe a key before
+uploading it, that negative response sticks around and the file looks missing
+after a perfectly good upload. Bust it with a `?cb=1` query.
+
+Object layout (keys are relative to the bucket root):
 
     hero/      15s silent montage, 1920x1080 + a 1280x720 variant
     work/      7 silent hover loops, 1280x720, ~7-8s
@@ -43,6 +63,10 @@ browser; the 4K/1080p masters are NOT in the repo.
     featured/  An Evening with Carpa, full 62s with audio
     social/    9 vertical reels, 608x1080, audio kept for tap-to-unmute
     posters/   poster frame for every one of the above
+    tiles/     seven 2200px stills for the zoom-parallax hero
+
+`public/` keeps only what must be same-origin: `og.jpg` (some scrapers are
+fussy about cross-origin cards), the favicon, and `grain.png`.
 
 Rules learned the hard way when cutting these, worth keeping:
 
@@ -88,8 +112,6 @@ git-backed and would permanently block the connected-site path.
   Fonts stylesheet (render-blocking; costs LCP).
 - A vector logo and crew headshots from Austin. The wordmark is still type, not
   artwork, and the About section has no faces.
-- Move `public/media/` to R2 behind the media host if the repo gets heavy. At
-  ~92MB it is fine in git today; a second pass of footage would change that.
 - Publish these sections through CentraMind so Austin can reorder the work grid
   himself. Until `site.live` is true with published sections, the coded
   fallback in `src/pages/index.astro` IS the page.

@@ -5,7 +5,7 @@ import ZoomHero from '../components/ZoomHero.astro';
 import WorkGrid from '../components/WorkGrid.astro';
 import FeaturedFilm from '../components/FeaturedFilm.astro';
 import SocialStrip from '../components/SocialStrip.astro';
-import type { WorkItem, Reel } from '../lib/media';
+import { media, type WorkItem, type Reel } from '../lib/media';
 import { getContent } from '../lib/content';
 
 const content = await getContent();
@@ -30,35 +30,35 @@ const work: WorkItem[] = [
     client: 'Custom By Kenneth Boggs',
     tag: 'Commercial',
     year: '2025',
-    loop: '/media/work/kennethboggs.mp4',
-    poster: '/media/posters/kennethboggs.jpg',
-    full: '/media/full/kennethboggs.mp4',
+    loop: media('work/kennethboggs.mp4'),
+    poster: media('posters/kennethboggs.jpg'),
+    full: media('full/kennethboggs.mp4'),
   },
   {
     key: 'hhc',
     title: 'Houston TX Hot Chicken',
     client: 'Houston TX Hot Chicken',
     tag: 'Brand campaign',
-    loop: '/media/work/hhc.mp4',
-    poster: '/media/posters/hhc.jpg',
-    full: '/media/full/hhc.mp4',
+    loop: media('work/hhc.mp4'),
+    poster: media('posters/hhc.jpg'),
+    full: media('full/hhc.mp4'),
   },
   {
     key: 'carpa',
     title: 'An Evening with Carpa',
     tag: 'Short film',
-    loop: '/media/work/carpa.mp4',
-    poster: '/media/posters/carpa.jpg',
-    full: '/media/featured/carpa-film.mp4',
+    loop: media('work/carpa.mp4'),
+    poster: media('posters/carpa.jpg'),
+    full: media('featured/carpa-film.mp4'),
   },
   {
     key: 'absoluteflight',
     title: 'Absolute Flight',
     client: 'Absolute Flight',
     tag: 'Documentary',
-    loop: '/media/work/absoluteflight.mp4',
-    poster: '/media/posters/absoluteflight.jpg',
-    full: '/media/full/absoluteflight.mp4',
+    loop: media('work/absoluteflight.mp4'),
+    poster: media('posters/absoluteflight.jpg'),
+    full: media('full/absoluteflight.mp4'),
   },
   {
     key: 'lehimtb',
@@ -66,53 +66,53 @@ const work: WorkItem[] = [
     client: 'Lehi MTB',
     tag: 'Event film',
     year: '2024',
-    loop: '/media/work/lehimtb.mp4',
-    poster: '/media/posters/lehimtb.jpg',
-    full: '/media/full/lehimtb.mp4',
+    loop: media('work/lehimtb.mp4'),
+    poster: media('posters/lehimtb.jpg'),
+    full: media('full/lehimtb.mp4'),
   },
   {
     key: 'ecopoint',
     title: 'EcoPoint',
     client: 'EcoPoint',
     tag: 'Brand film',
-    loop: '/media/work/ecopoint.mp4',
-    poster: '/media/posters/ecopoint.jpg',
-    full: '/media/full/ecopoint.mp4',
+    loop: media('work/ecopoint.mp4'),
+    poster: media('posters/ecopoint.jpg'),
+    full: media('full/ecopoint.mp4'),
   },
   {
     key: 'basicaf',
     title: 'Basic AF',
     client: 'Basic AF',
     tag: 'Documentary series',
-    loop: '/media/work/basicaf.mp4',
-    poster: '/media/posters/basicaf.jpg',
-    full: '/media/full/basicaf.mp4',
+    loop: media('work/basicaf.mp4'),
+    poster: media('posters/basicaf.jpg'),
+    full: media('full/basicaf.mp4'),
   },
 ];
 
 const reels: Reel[] = [
-  { key: 'kb-suits',        client: 'Kenneth Boggs / Suits and Supercars', loop: '/media/social/kb-suits.mp4',        poster: '/media/posters/kb-suits.jpg' },
-  { key: 'hhc-farmington',  client: 'Houston TX Hot Chicken / Farmington', loop: '/media/social/hhc-farmington.mp4',  poster: '/media/posters/hhc-farmington.jpg' },
-  { key: 'ee-obscene',      client: 'Estates and Exotics',                 loop: '/media/social/ee-obscene.mp4',      poster: '/media/posters/ee-obscene.jpg' },
-  { key: 'estates-exotics', client: 'Estates and Exotics',                 loop: '/media/social/estates-exotics.mp4', poster: '/media/posters/estates-exotics.jpg' },
-  { key: 'hhc-stgeorge',    client: 'Houston TX Hot Chicken / St. George', loop: '/media/social/hhc-stgeorge.mp4',    poster: '/media/posters/hhc-stgeorge.jpg' },
-  { key: 'publik-2',        client: 'Basic AF',                            loop: '/media/social/publik-2.mp4',        poster: '/media/posters/publik-2.jpg' },
-  { key: 'taste-test',      client: 'Basic AF / Taste test',               loop: '/media/social/taste-test.mp4',      poster: '/media/posters/taste-test.jpg' },
-  { key: 'jason-chris',     client: 'Basic AF',                            loop: '/media/social/jason-chris.mp4',     poster: '/media/posters/jason-chris.jpg' },
-  { key: 'publik-basic',    client: 'Basic AF',                            loop: '/media/social/publik-basic.mp4',    poster: '/media/posters/publik-basic.jpg' },
+  { key: 'kb-suits',        client: 'Kenneth Boggs / Suits and Supercars', loop: media('social/kb-suits.mp4'),        poster: media('posters/kb-suits.jpg') },
+  { key: 'hhc-farmington',  client: 'Houston TX Hot Chicken / Farmington', loop: media('social/hhc-farmington.mp4'),  poster: media('posters/hhc-farmington.jpg') },
+  { key: 'ee-obscene',      client: 'Estates and Exotics',                 loop: media('social/ee-obscene.mp4'),      poster: media('posters/ee-obscene.jpg') },
+  { key: 'estates-exotics', client: 'Estates and Exotics',                 loop: media('social/estates-exotics.mp4'), poster: media('posters/estates-exotics.jpg') },
+  { key: 'hhc-stgeorge',    client: 'Houston TX Hot Chicken / St. George', loop: media('social/hhc-stgeorge.mp4'),    poster: media('posters/hhc-stgeorge.jpg') },
+  { key: 'publik-2',        client: 'Basic AF',                            loop: media('social/publik-2.mp4'),        poster: media('posters/publik-2.jpg') },
+  { key: 'taste-test',      client: 'Basic AF / Taste test',               loop: media('social/taste-test.mp4'),      poster: media('posters/taste-test.jpg') },
+  { key: 'jason-chris',     client: 'Basic AF',                            loop: media('social/jason-chris.mp4'),     poster: media('posters/jason-chris.jpg') },
+  { key: 'publik-basic',    client: 'Basic AF',                            loop: media('social/publik-basic.mp4'),    poster: media('posters/publik-basic.jpg') },
 ];
 
 // The zoom-parallax hero's seven tiles, one frame per client piece. Tile 0
 // sits dead centre and scales to exactly fill the viewport, so it is the one
 // that carries the montage.
 const heroTiles = [
-  { src: '/media/tiles/tile-01.jpg', alt: '' },
-  { src: '/media/tiles/tile-02.jpg', alt: '' },
-  { src: '/media/tiles/tile-03.jpg', alt: '' },
-  { src: '/media/tiles/tile-04.jpg', alt: '' },
-  { src: '/media/tiles/tile-05.jpg', alt: '' },
-  { src: '/media/tiles/tile-06.jpg', alt: '' },
-  { src: '/media/tiles/tile-07.jpg', alt: '' },
+  { src: media('tiles/tile-01.jpg'), alt: '' },
+  { src: media('tiles/tile-02.jpg'), alt: '' },
+  { src: media('tiles/tile-03.jpg'), alt: '' },
+  { src: media('tiles/tile-04.jpg'), alt: '' },
+  { src: media('tiles/tile-05.jpg'), alt: '' },
+  { src: media('tiles/tile-06.jpg'), alt: '' },
+  { src: media('tiles/tile-07.jpg'), alt: '' },
 ];
 
 const services = [
@@ -128,9 +128,9 @@ const services = [
     <Fragment>
       <ZoomHero
         tiles={heroTiles}
-        video="/media/hero/hero-loop.mp4"
-        videoSmall="/media/hero/hero-loop-720.mp4"
-        videoPoster="/media/posters/hero.jpg"
+        video={media('hero/hero-loop.mp4')}
+        videoSmall={media('hero/hero-loop-720.mp4')}
+        videoPoster={media('posters/hero.jpg')}
       >
         <span class="eyebrow">Salt Lake City, UT / Video production + social</span>
         <h1>Video that brings<br />customers. Not just views.</h1>
@@ -146,8 +146,8 @@ const services = [
       <WorkGrid items={work} />
 
       <FeaturedFilm
-        src="/media/featured/carpa-film.mp4"
-        poster="/media/posters/carpa-film.jpg"
+        src={media('featured/carpa-film.mp4')}
+        poster={media('posters/carpa-film.jpg')}
         title="An Evening with Carpa"
         client="Short film"
         tag="Directed and shot by VSN CUT"

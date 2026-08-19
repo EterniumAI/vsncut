@@ -17,7 +17,7 @@ const description =
 // card on every platform that unfurls. Astro.url is the real request url under
 // SSR, so this resolves correctly on the pages.dev preview and on vsncut.com
 // without hardcoding either. A CentraMind-published og_image wins if set.
-const ogImage = site.seo?.og_image?.trim() || new URL('/media/og.jpg', Astro.url).href;
+const ogImage = site.seo?.og_image?.trim() || new URL('/og.jpg', Astro.url).href;
 const ogImageAlt = 'VSN CUT. Video that brings customers. Not just views.';
 
 // Runtime brand overrides are written as inline CSS vars on <body> so they
