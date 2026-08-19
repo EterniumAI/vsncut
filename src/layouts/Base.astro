@@ -61,6 +61,42 @@ const ld = {
 
     <script type="application/ld+json" set:html={JSON.stringify(ld)} />
   </head>
+  <script>
+    // One soundtrack at a time, enforced for the whole page.
+    //
+    // Each component policed audio only within itself, so the three audible
+    // surfaces could stack: press play on the featured film, tap a reel to
+    // unmute it, then open a work card's lightbox and all three run at once.
+    // FeaturedFilm has no script of its own, so this cannot live in a
+    // component; it has to be here.
+    //
+    // Capture phase because 'play' does not bubble. Muted elements are ignored
+    // on purpose: the hero montage, the hover loops and the resting reels are
+    // silent decoration and must keep running underneath whatever is audible.
+    document.addEventListener(
+      'play',
+      (e) => {
+        const el = e.target as HTMLMediaElement;
+        if (!(el instanceof HTMLMediaElement) || el.muted) return;
+        document.querySelectorAll<HTMLMediaElement>('video, audio').forEach((other) => {
+          if (other === el || other.paused || other.muted) return;
+          other.pause();
+          // A reel carries its mute state in the UI, so put it back rather
+          // than leaving a card claiming "Sound on" over a paused video.
+          const card = other.closest('[data-reel]');
+          if (card) {
+            other.muted = true;
+            card.classList.remove('is-live');
+            card.setAttribute('aria-pressed', 'false');
+            const flag = card.querySelector('[data-audio-flag]');
+            if (flag) flag.textContent = 'Sound off';
+            other.play().catch(() => {});
+          }
+        });
+      },
+      true
+    );
+  </script>
   <body style={vars}>
     <NavBar />
     <main><slot /></main>

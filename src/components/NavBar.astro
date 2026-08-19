@@ -103,19 +103,44 @@ const links = [
 <script>
   const burger = document.querySelector('[data-burger]');
   const sheet = document.querySelector('[data-sheet]');
+
   if (burger && sheet) {
-    burger.addEventListener('click', () => {
-      const open = sheet.hasAttribute('hidden');
-      if (open) sheet.removeAttribute('hidden'); else sheet.setAttribute('hidden', '');
+    // The sheet is opaque and covers everything below the header, but it is a
+    // sibling BEFORE <main>, so tabbing past its last link used to walk into
+    // the hero buttons, the seven work cards and the nine reels, all of them
+    // painted over. Focus was invisible and Enter fired a control the user
+    // could not see (WCAG 2.4.11). inert takes that content out of the tab
+    // order and the a11y tree for as long as the sheet is up.
+    const behind = () => [document.querySelector('main'), document.querySelector('footer')]
+      .filter((el): el is HTMLElement => !!el);
+
+    const setOpen = (open: boolean) => {
+      if (open) sheet.removeAttribute('hidden');
+      else sheet.setAttribute('hidden', '');
       burger.setAttribute('aria-expanded', String(open));
       burger.classList.toggle('is-open', open);
+      behind().forEach((el) => {
+        if (open) el.setAttribute('inert', '');
+        else el.removeAttribute('inert');
+      });
+      document.body.style.overflow = open ? 'hidden' : '';
+      if (open) sheet.querySelector('a')?.focus();
+    };
+
+    burger.addEventListener('click', () => setOpen(sheet.hasAttribute('hidden')));
+    sheet.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !sheet.hasAttribute('hidden')) {
+        setOpen(false);
+        (burger as HTMLElement).focus();
+      }
     });
-    sheet.querySelectorAll('a').forEach((a) =>
-      a.addEventListener('click', () => {
-        sheet.setAttribute('hidden', '');
-        burger.setAttribute('aria-expanded', 'false');
-        burger.classList.remove('is-open');
-      })
-    );
+
+    // Crossing back to desktop with the sheet open would otherwise leave main
+    // inert forever, since the sheet just display:none's at >=821px.
+    window.matchMedia('(min-width: 821px)').addEventListener('change', (e) => {
+      if (e.matches && !sheet.hasAttribute('hidden')) setOpen(false);
+    });
   }
 </script>

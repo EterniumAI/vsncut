@@ -20,6 +20,11 @@ Tokens in `src/styles/tokens.css` are copied VERBATIM from the VSN CUT design
 system (claude.ai/design project `86fceff9-609d-4112-91d0-f16da3fa7ab6`). Do not
 hand-tune them here; change them there and re-copy, or the two drift.
 
+The one number on the page, `1.6B+ views across client content`, is supplied by
+Austin and confirmed by Ty (2026-08-19), sourced to SHORT CUT's own reporting.
+It has no public source, so automated reviews flag it; it is legitimate and
+stays. That is a documented exception, not a loosening of the rule below.
+
 House rules that outlive any one page: near-black + off-white + signal yellow
 only, Bebas Neue display (always uppercase) / Archivo body / IBM Plex Mono
 metadata, square corners, 1px hairline borders, no shadows. Outcome-led copy.

@@ -117,9 +117,13 @@ const { items } = Astro.props;
     transition: filter var(--dur-med) var(--ease-cine), opacity var(--dur-med) var(--ease-cine);
   }
   .frame-video { opacity: 0; }
+  /* .is-previewing is the touch equivalent of :hover, set by the observer on
+     the one card it decided to play. Without it the clip decodes invisibly. */
   .work-card:hover .frame img,
+  .work-card.is-previewing .frame img,
   .frame:focus-visible img { filter: grayscale(.15) contrast(1.05); }
   .work-card:hover .frame-video,
+  .work-card.is-previewing .frame-video,
   .frame:focus-visible .frame-video { opacity: 1; filter: grayscale(0) contrast(1.03); }
 
   .frame-grain {
@@ -176,38 +180,85 @@ const { items } = Astro.props;
 </style>
 
 <script>
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  import { motionAllowed, onMotionChange } from '../lib/motion';
+
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-card]'));
+  const loopOf = (c: Element) => c.querySelector<HTMLVideoElement>('[data-loop]');
+
+  const pauseAll = () => cards.forEach((c) => {
+    loopOf(c)?.pause();
+    c.classList.remove('is-previewing');
+  });
 
   // Hover/focus preview. Touch devices get no hover, so the loop is driven by
   // the viewport there instead (below) and the tap opens the real player.
-  if (!reduce) {
-    document.querySelectorAll<HTMLElement>('[data-card]').forEach((card) => {
-      const v = card.querySelector<HTMLVideoElement>('[data-loop]');
-      if (!v) return;
-      const start = () => { v.play().catch(() => {}); };
-      const stop = () => { v.pause(); };
-      card.addEventListener('pointerenter', start);
-      card.addEventListener('pointerleave', stop);
-      card.addEventListener('focusin', start);
-      card.addEventListener('focusout', stop);
-    });
+  document.querySelectorAll<HTMLElement>('[data-card]').forEach((card) => {
+    const v = loopOf(card);
+    if (!v) return;
+    const start = () => { if (motionAllowed()) v.play().catch(() => {}); };
+    const stop = () => { v.pause(); };
+    card.addEventListener('pointerenter', start);
+    card.addEventListener('pointerleave', stop);
+    card.addEventListener('focusin', start);
+    card.addEventListener('focusout', stop);
+  });
 
-    // Coarse pointers: play whichever card is centred in the viewport.
-    if (window.matchMedia('(hover: none)').matches && 'IntersectionObserver' in window) {
-      const io = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((e) => {
-            const v = e.target.querySelector<HTMLVideoElement>('[data-loop]');
-            if (!v) return;
-            if (e.isIntersecting) v.play().catch(() => {});
-            else v.pause();
-          });
-        },
-        { threshold: 0.6 }
-      );
-      document.querySelectorAll('[data-card]').forEach((c) => io.observe(c));
-    }
+  // Coarse pointers get no hover, so the viewport drives the preview. Exactly
+  // ONE card plays: the one nearest the middle of the screen.
+  //
+  // Playing every intersecting card instead (the obvious IntersectionObserver
+  // shape) is a real cost, not a style question. On a phone the grid is one
+  // column, so an ordinary scroll crosses all seven cards and play() overrides
+  // preload="none" on each, pulling ~13.8MB. Worse, .frame-video only becomes
+  // visible on :hover / :focus-visible, neither of which a touch scroll can
+  // trigger, so all of it decodes underneath an opaque poster for no visible
+  // motion at all. Hence both halves of the fix: pick one card, and mark it
+  // .is-previewing so the clip the user paid for is the clip they see.
+  if (window.matchMedia('(hover: none)').matches && 'IntersectionObserver' in window) {
+    const visible = new Set<Element>();
+    let current: Element | null = null;
+
+    const settle = () => {
+      if (!motionAllowed()) { pauseAll(); current = null; return; }
+      const mid = window.innerHeight / 2;
+      let best: Element | null = null;
+      let bestDist = Infinity;
+      visible.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        const d = Math.abs(r.top + r.height / 2 - mid);
+        if (d < bestDist) { bestDist = d; best = el; }
+      });
+      if (best === current) return;
+      if (current) {
+        loopOf(current)?.pause();
+        current.classList.remove('is-previewing');
+      }
+      current = best;
+      if (current) {
+        current.classList.add('is-previewing');
+        loopOf(current)?.play().catch(() => {});
+      }
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) visible.add(e.target);
+          else {
+            visible.delete(e.target);
+            loopOf(e.target)?.pause();
+            e.target.classList.remove('is-previewing');
+          }
+        });
+        settle();
+      },
+      { threshold: 0.6 }
+    );
+    cards.forEach((c) => io.observe(c));
+    window.addEventListener('scroll', () => { requestAnimationFrame(settle); }, { passive: true });
   }
+
+  onMotionChange((allowed) => { if (!allowed) pauseAll(); });
 
   // Lightbox. <dialog> gives focus trapping and Esc for free; all that is left
   // is pausing on close so audio never outlives the modal.

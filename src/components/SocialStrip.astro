@@ -23,8 +23,18 @@ const { reels } = Astro.props;
   </div>
 
   <div class="rail" data-rail>
+    {/* Each card is a toggle, so it needs aria-pressed. The visible
+        "Sound on/off" chip is swapped by script, but an aria-label beats
+        name-from-content in the accname algorithm, so without aria-pressed
+        nothing about the state ever reaches a screen reader. */}
     {reels.map((r) => (
-      <button class="reel-card" type="button" data-reel aria-label={`Play ${r.client} reel with sound`}>
+      <button
+        class="reel-card"
+        type="button"
+        data-reel
+        aria-pressed="false"
+        aria-label={`Sound for the ${r.client} reel`}
+      >
         <video
           data-reel-video
           src={r.loop}
@@ -78,15 +88,21 @@ const { reels } = Astro.props;
     position: absolute; left: 12px; bottom: 12px; max-width: calc(100% - 24px);
     font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
     letter-spacing: var(--tracking-caps); line-height: 1.2; text-align: left;
-    padding: 7px 10px; background: rgba(10,10,11,.72);
+    padding: 7px 10px; background: rgba(10,10,11,.85);
     border: 1px solid var(--border-strong); color: var(--text-soft);
   }
+  /* This chip is the only text carrying mute state and it sits directly on
+     video with no section scrim, so 28% of every frame used to composite
+     through a --text-muted label: 8 of the 9 shipped reels failed 4.5:1, the
+     brightest at 2.8. Its sibling .reel-client already used --text-soft on the
+     same backing and cleared everywhere, so this matches it and darkens the
+     plate enough to hold across the footage. */
   .reel-audio {
     position: absolute; right: 12px; top: 12px;
     font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
     letter-spacing: var(--tracking-caps); line-height: 1;
-    padding: 6px 9px; background: rgba(10,10,11,.72);
-    border: 1px solid var(--border-strong); color: var(--text-muted);
+    padding: 6px 9px; background: rgba(10,10,11,.88);
+    border: 1px solid var(--border-strong); color: var(--text-soft);
   }
   .reel-card.is-live .reel-audio { color: var(--accent); border-color: var(--accent); }
 
@@ -96,18 +112,22 @@ const { reels } = Astro.props;
 </style>
 
 <script>
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  import { motionAllowed, onMotionChange } from '../lib/motion';
+
   const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-reel]'));
+  const videoOf = (c: Element) => c.querySelector<HTMLVideoElement>('[data-reel-video]');
 
   // Only the reels actually on screen decode. Without this the rail would keep
-  // nine 1080-tall videos alive at once on a phone.
-  if (!reduce && 'IntersectionObserver' in window) {
+  // nine 1080-tall videos alive at once on a phone. Unlike the work grid this
+  // is a horizontal rail, so at most two or three are ever on screen and
+  // playing all of them is the right behaviour.
+  if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
-          const v = e.target.querySelector<HTMLVideoElement>('[data-reel-video]');
+          const v = videoOf(e.target);
           if (!v) return;
-          if (e.isIntersecting) v.play().catch(() => {});
+          if (e.isIntersecting && motionAllowed()) v.play().catch(() => {});
           else v.pause();
         });
       },
@@ -116,26 +136,32 @@ const { reels } = Astro.props;
     cards.forEach((c) => io.observe(c));
   }
 
+  onMotionChange((allowed) => {
+    cards.forEach((c) => { if (!allowed) videoOf(c)?.pause(); });
+  });
+
   // Tap to unmute. Only one reel is ever audible, so tapping a second one
   // silences the first rather than stacking two soundtracks.
+  const setAudioState = (card: Element, on: boolean) => {
+    const v = videoOf(card);
+    const flag = card.querySelector<HTMLElement>('[data-audio-flag]');
+    if (!v) return;
+    v.muted = !on;
+    card.classList.toggle('is-live', on);
+    card.setAttribute('aria-pressed', String(on));
+    if (flag) flag.textContent = on ? 'Sound on' : 'Sound off';
+  };
+
   cards.forEach((card) => {
     card.addEventListener('click', () => {
-      const v = card.querySelector<HTMLVideoElement>('[data-reel-video]');
-      const flag = card.querySelector<HTMLElement>('[data-audio-flag]');
+      const v = videoOf(card);
       if (!v) return;
       const turningOn = v.muted;
-      cards.forEach((other) => {
-        const ov = other.querySelector<HTMLVideoElement>('[data-reel-video]');
-        const of = other.querySelector<HTMLElement>('[data-audio-flag]');
-        if (!ov) return;
-        ov.muted = true;
-        other.classList.remove('is-live');
-        if (of) of.textContent = 'Sound off';
-      });
+      cards.forEach((other) => setAudioState(other, false));
       if (turningOn) {
-        v.muted = false;
-        card.classList.add('is-live');
-        if (flag) flag.textContent = 'Sound on';
+        setAudioState(card, true);
+        // Unmuting is a user gesture, so play here even if motion is paused:
+        // they explicitly asked for this one reel.
         v.play().catch(() => {});
       }
     });
