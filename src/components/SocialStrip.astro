@@ -75,6 +75,9 @@ const { reels } = Astro.props;
      or leave dead scroll after it. */
   [data-social].is-pinned .social-pin {
     position: sticky; top: 0; height: 100svh;
+    /* Clears the sticky nav, which otherwise crops the eyebrow off the top of
+       the heading for the whole time the section is held. */
+    padding-top: var(--nav-h);
     display: flex; flex-direction: column; justify-content: center;
     overflow: hidden;
   }

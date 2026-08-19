@@ -146,7 +146,9 @@ const shown = tiles.slice(0, 7);
     position: absolute; inset: auto 0 0 0; z-index: 2;
     padding: 0 var(--container-pad) clamp(72px, 12vh, 128px);
     opacity: 0; pointer-events: none;
-    background: linear-gradient(to top, rgba(10,10,11,.92) 0%, rgba(10,10,11,.55) 55%, rgba(10,10,11,0) 100%);
+    background: linear-gradient(to top,
+      rgba(10,10,11,.95) 0%, rgba(10,10,11,.88) 35%,
+      rgba(10,10,11,.62) 70%, rgba(10,10,11,0) 100%);
   }
   .zoom-stats-inner {
     max-width: var(--container-max); margin: 0 auto;
@@ -171,9 +173,14 @@ const shown = tiles.slice(0, 7);
     font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
     letter-spacing: var(--tracking-caps); color: var(--text-muted);
   }
+  /* Stacked rather than in a row below this width, so the plate has to reach
+     much further up the frame to sit under all three. */
   @media (max-width: 620px) {
-    .zoom-stats-inner { gap: 18px; }
-    .zoom-stat-value { font-size: clamp(36px, 12vw, 56px); }
+    .zoom-stats { padding-bottom: clamp(56px, 9vh, 96px); }
+    .zoom-stats-inner { gap: 14px; }
+    .zoom-stat { gap: 2px; }
+    .zoom-stat-value { font-size: clamp(34px, 11vw, 52px); }
+    .zoom-stat-label { font-size: 15px; }
   }
 
   /* The page's single stop control for auto-playing video. A real focusable

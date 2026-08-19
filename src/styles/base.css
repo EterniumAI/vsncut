@@ -10,6 +10,10 @@
    chase phantom height. Costs pull-to-refresh, which a marketing page has no
    use for. */
 html{overscroll-behavior-y:none}
+/* The nav is sticky, so anything else that pins to top:0 slides underneath it.
+   One token, so the two never drift apart. */
+:root{--nav-h:72px}
+@media (max-width:820px){:root{--nav-h:64px}}
 body{margin:0;background:var(--surface-page);color:var(--text-body);font-family:var(--font-body);font-size:var(--text-md);line-height:var(--leading-body);-webkit-font-smoothing:antialiased}
 a{color:var(--text-body);text-decoration:none;transition:color var(--dur-fast) var(--ease-cine)}
 a:hover{color:var(--accent)}
