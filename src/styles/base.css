@@ -3,6 +3,13 @@
  * "site chrome" is layout this coded head needs and the DS does not define.
  */
 *,*::before,*::after{box-sizing:border-box}
+/* iOS rubber-banding past the end of the document exposes a tall band of page
+   background below the footer, which reads as a broken layout rather than a
+   bounce. There is no real gap (the footer's box ends exactly at
+   documentElement.scrollHeight), so the fix is to stop the overscroll, not to
+   chase phantom height. Costs pull-to-refresh, which a marketing page has no
+   use for. */
+html{overscroll-behavior-y:none}
 body{margin:0;background:var(--surface-page);color:var(--text-body);font-family:var(--font-body);font-size:var(--text-md);line-height:var(--leading-body);-webkit-font-smoothing:antialiased}
 a{color:var(--text-body);text-decoration:none;transition:color var(--dur-fast) var(--ease-cine)}
 a:hover{color:var(--accent)}

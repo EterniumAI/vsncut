@@ -20,6 +20,11 @@ const description =
 const ogImage = site.seo?.og_image?.trim() || new URL('/og.jpg', Astro.url).href;
 const ogImageAlt = 'VSN CUT. Video that brings customers. Not just views.';
 
+// Shares often carry tracking or cache-busting query strings. Canonical and
+// og:url drop them so every variant of the link resolves to one page in a
+// scraper's cache rather than fragmenting into near-duplicates.
+const cleanUrl = new URL(Astro.url.pathname, Astro.url.origin).href;
+
 // Runtime brand overrides are written as inline CSS vars on <body> so they
 // cascade past Astro's scoped styles. Guarded: a non-hex value is dropped
 // rather than emitted, so a bad row can never inject into the style attribute.
@@ -48,7 +53,7 @@ const ld = {
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#0A0A0B" />
-    <link rel="canonical" href={Astro.url.href} />
+    <link rel="canonical" href={cleanUrl} />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -57,7 +62,7 @@ const ld = {
     <meta property="og:site_name" content={name} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:url" content={cleanUrl} />
     <meta property="og:locale" content="en_US" />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:secure_url" content={ogImage} />
@@ -71,6 +76,7 @@ const ld = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={ogImageAlt} />
+    <link rel="image_src" href={ogImage} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

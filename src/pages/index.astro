@@ -90,16 +90,22 @@ const work: WorkItem[] = [
   },
 ];
 
+// Ordered so no two reels from the same brand sit next to each other. The
+// natural grouping (all four Basic AF together, both Estates and Exotics
+// together) reads as a contact sheet of one shoot rather than a body of work.
+// Counts are Basic AF 4, HHC 2, E&E 2, KB 1 across 9 slots, so the four have
+// to be spread every other card; anything less even puts two side by side.
+// If a reel is added here, re-check the neighbours.
 const reels: Reel[] = [
   { key: 'kb-suits',        client: 'Kenneth Boggs / Suits and Supercars', loop: media('social/kb-suits.mp4'),        poster: media('posters/kb-suits.jpg') },
-  { key: 'hhc-farmington',  client: 'Houston TX Hot Chicken / Farmington', loop: media('social/hhc-farmington.mp4'),  poster: media('posters/hhc-farmington.jpg') },
-  { key: 'ee-obscene',      client: 'Estates and Exotics',                 loop: media('social/ee-obscene.mp4'),      poster: media('posters/ee-obscene.jpg') },
-  { key: 'estates-exotics', client: 'Estates and Exotics',                 loop: media('social/estates-exotics.mp4'), poster: media('posters/estates-exotics.jpg') },
-  { key: 'hhc-stgeorge',    client: 'Houston TX Hot Chicken / St. George', loop: media('social/hhc-stgeorge.mp4'),    poster: media('posters/hhc-stgeorge.jpg') },
   { key: 'publik-2',        client: 'Basic AF',                            loop: media('social/publik-2.mp4'),        poster: media('posters/publik-2.jpg') },
+  { key: 'hhc-farmington',  client: 'Houston TX Hot Chicken / Farmington', loop: media('social/hhc-farmington.mp4'),  poster: media('posters/hhc-farmington.jpg') },
   { key: 'taste-test',      client: 'Basic AF / Taste test',               loop: media('social/taste-test.mp4'),      poster: media('posters/taste-test.jpg') },
+  { key: 'ee-obscene',      client: 'Estates and Exotics',                 loop: media('social/ee-obscene.mp4'),      poster: media('posters/ee-obscene.jpg') },
   { key: 'jason-chris',     client: 'Basic AF',                            loop: media('social/jason-chris.mp4'),     poster: media('posters/jason-chris.jpg') },
+  { key: 'hhc-stgeorge',    client: 'Houston TX Hot Chicken / St. George', loop: media('social/hhc-stgeorge.mp4'),    poster: media('posters/hhc-stgeorge.jpg') },
   { key: 'publik-basic',    client: 'Basic AF',                            loop: media('social/publik-basic.mp4'),    poster: media('posters/publik-basic.jpg') },
+  { key: 'estates-exotics', client: 'Estates and Exotics',                 loop: media('social/estates-exotics.mp4'), poster: media('posters/estates-exotics.jpg') },
 ];
 
 // The zoom-parallax hero's seven tiles, one frame per client piece. Tile 0
@@ -115,6 +121,17 @@ const heroTiles = [
   { src: media('tiles/tile-07.jpg'), alt: '' },
 ];
 
+// Shown as the hero zoom resolves. Every figure here is defensible: the 1.6B
+// is Austin-supplied and confirmed by Ty (see the note above the old stat
+// band), and the other two are literally countable on this page -- eight named
+// clients across the work grid and the reel rail, and the four-person crew the
+// About section names. Nothing invented, per the design system.
+const heroStats = [
+  { value: '1.6B+', label: 'Views across client content', sub: 'via SHORT CUT, our social arm' },
+  { value: '8', label: 'Brands in this reel', sub: 'Commercial, event, documentary' },
+  { value: '4', label: 'People, one roof', sub: 'Salt Lake City, UT' },
+];
+
 const services = [
   { index: '01', title: 'Video production', description: 'Direction, cinematography, editing, drone. One crew end to end.' },
   { index: '02', title: 'Short Cut / Social', description: 'Our social media arm, SHORT CUT, runs the channels the footage feeds.' },
@@ -128,6 +145,7 @@ const services = [
     <Fragment>
       <ZoomHero
         tiles={heroTiles}
+        stats={heroStats}
         video={media('hero/hero-loop.mp4')}
         videoSmall={media('hero/hero-loop-720.mp4')}
         videoPoster={media('posters/hero.jpg')}
@@ -153,20 +171,6 @@ const services = [
         tag="Directed and shot by VSN CUT"
         blurb="A minute of what a camera can do for a story when nobody is rushing it. Sound on."
       />
-
-      {/* The 1.6B+ figure is supplied by Austin and confirmed by Ty on
-          2026-08-19. It is NOT fabricated and it is NOT to be removed as an
-          unsourced metric: reviewers have flagged it twice now because the
-          number has no public source, which is expected. SHORT CUT's own
-          reporting is the source. Anything else numeric on this page still
-          falls under the design system's no-invented-metrics rule. */}
-      <section class="stat-band">
-        <div class="wrap stat-inner">
-          <span class="stat-value">1.6B+</span>
-          <span class="stat-label">views across client content</span>
-          <span class="stat-sub">via SHORT CUT, our social media arm</span>
-        </div>
-      </section>
 
       <SocialStrip reels={reels} />
 

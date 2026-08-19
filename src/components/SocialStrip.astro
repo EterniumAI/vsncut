@@ -10,19 +10,21 @@ import type { Reel } from '../lib/media';
 interface Props { reels: Reel[] }
 const { reels } = Astro.props;
 ---
-<section id="short-cut" data-brand-scope="shortcut">
-  <div class="wrap">
-    <div class="heading">
-      <span class="eyebrow">Short Cut / Social</span>
-      <h2>Built for the feed</h2>
-      <p class="sub">
-        SHORT CUT is our social arm. Vertical, sound on, cut to hold attention in the
-        first second. Tap any reel for audio.
-      </p>
-    </div>
-  </div>
+<section id="short-cut" data-brand-scope="shortcut" data-social>
+  <div class="social-track" data-track>
+    <div class="social-pin" data-pin>
+      <div class="wrap">
+        <div class="heading">
+          <span class="eyebrow">Short Cut / Social</span>
+          <h2>Built for the feed</h2>
+          <p class="sub">
+            SHORT CUT is our social arm. Vertical, sound on, cut to hold attention in the
+            first second. Tap any reel for audio.
+          </p>
+        </div>
+      </div>
 
-  <div class="rail" data-rail>
+      <div class="rail" data-rail>
     {/* Each card is a toggle, so it needs aria-pressed. The visible
         "Sound on/off" chip is swapped by script, but an aria-label beats
         name-from-content in the accname algorithm, so without aria-pressed
@@ -49,11 +51,50 @@ const { reels } = Astro.props;
         <span class="reel-audio" data-audio-flag>Sound off</span>
       </button>
     ))}
+      </div>
+
+      <div class="rail-progress" aria-hidden="true"><span data-rail-progress></span></div>
+    </div>
   </div>
 </section>
 
 <style>
   .heading { display: flex; flex-direction: column; gap: 14px; margin-bottom: var(--space-7); }
+
+  /* Default is a plain section with a natively swipeable rail. That is what
+     ships with JS off and under reduced motion, and it is fully usable.
+     The pinned mode below is added by script only when there is actually
+     something off-screen to reveal. */
+  .social-track { position: relative; }
+  .social-pin { display: block; }
+
+  /* Pinned mode: the section holds the viewport for a stretch of scroll, and
+     that vertical distance drives the rail sideways, so the reels cannot be
+     scrolled past without being seen. Height is set inline from the real
+     overflow width, because hardcoding it would either strand the last reel
+     or leave dead scroll after it. */
+  [data-social].is-pinned .social-pin {
+    position: sticky; top: 0; height: 100svh;
+    display: flex; flex-direction: column; justify-content: center;
+    overflow: hidden;
+  }
+  [data-social].is-pinned .rail {
+    /* The vertical scroll is the control now, so the bar would just be noise,
+       and snap points fight a programmatically driven scrollLeft. */
+    scroll-snap-type: none;
+    scrollbar-width: none;
+  }
+  [data-social].is-pinned .rail::-webkit-scrollbar { display: none; }
+
+  .rail-progress {
+    height: 1px; background: var(--border-subtle); position: relative;
+    margin: var(--space-5) var(--container-pad) 0;
+  }
+  .rail-progress span {
+    position: absolute; inset: 0 auto 0 0; width: 0%;
+    background: var(--accent); transition: width 90ms linear;
+  }
+  [data-social]:not(.is-pinned) .rail-progress { display: none; }
 
   .rail {
     display: flex; gap: var(--space-4);
@@ -115,6 +156,66 @@ const { reels } = Astro.props;
   import { motionAllowed, onMotionChange } from '../lib/motion';
 
   const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-reel]'));
+
+  // ── the rail scrolls sideways as you scroll down ────────────────────────
+  //
+  // The section pins for a stretch of vertical scroll and that distance is
+  // mapped onto the rail's horizontal overflow, so every reel passes through
+  // the viewport instead of being scrolled past in a strip most people never
+  // touch. scrollLeft is driven rather than a transform, so the rail stays a
+  // real scroll container: swiping it directly still works, and it degrades to
+  // an ordinary horizontal scroller the moment this is switched off.
+  const section = document.querySelector<HTMLElement>('[data-social]');
+  const track = document.querySelector<HTMLElement>('[data-track]');
+  const pin = document.querySelector<HTMLElement>('[data-pin]');
+  const rail = document.querySelector<HTMLElement>('[data-rail]');
+  const bar = document.querySelector<HTMLElement>('[data-rail-progress]');
+  const reduceMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (section && track && pin && rail) {
+    let maxScroll = 0;
+    let raf: number | null = null;
+
+    const measure = () => {
+      // Unpin first so the rail reports its natural overflow, not last run's.
+      section.classList.remove('is-pinned');
+      track.style.height = '';
+      maxScroll = rail.scrollWidth - rail.clientWidth;
+
+      // Nothing hidden, or the user asked for less motion: stay a plain rail.
+      if (maxScroll < 24 || reduceMQ.matches) {
+        rail.scrollLeft = 0;
+        if (bar) bar.style.width = '0%';
+        return;
+      }
+      section.classList.add('is-pinned');
+      // Pace it to the content: a little over 1px of page scroll per px of
+      // rail travel reads as deliberate rather than frantic.
+      track.style.height = `calc(100svh + ${Math.round(maxScroll * 1.15)}px)`;
+      apply();
+    };
+
+    const apply = () => {
+      raf = null;
+      if (!section.classList.contains('is-pinned')) return;
+      const r = track.getBoundingClientRect();
+      const total = r.height - pin.getBoundingClientRect().height;
+      if (total <= 0) return;
+      const p = Math.min(1, Math.max(0, -r.top / total));
+      rail.scrollLeft = p * maxScroll;
+      if (bar) bar.style.width = `${Math.round(p * 100)}%`;
+    };
+
+    const schedule = () => { if (!raf) raf = requestAnimationFrame(apply); };
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', () => { measure(); }, { passive: true });
+    reduceMQ.addEventListener('change', measure);
+    // Card widths depend on fonts and the poster images, so measure once those
+    // have settled rather than trusting the first layout pass.
+    if (document.readyState === 'complete') measure();
+    else window.addEventListener('load', measure, { once: true });
+    measure();
+  }
   const videoOf = (c: Element) => c.querySelector<HTMLVideoElement>('[data-reel-video]');
 
   // Only the reels actually on screen decode. Without this the rail would keep
